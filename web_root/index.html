@@ -1,0 +1,233 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+<title>PZP Testbed</title>
+<meta charset="utf-8"/>
+<title>PZP Dashboard</title>
+<!--<link rel="icon" href="images/webinos.ico" type="image/x-icon">-->
+<link rel="stylesheet" href="css/index.css" type="text/css" media="screen"/>
+<link href='http://fonts.googleapis.com/css?family=Ovo' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="css/jquery.mobile-1.3.0.min.css" />
+<script src="./jquery-1.8.2.min.js"></script>
+<script src="js/jquery.mobile-1.3.0.min.js"></script>
+<script type="text/javascript" src="./webinos.js"></script>
+<script type="text/javascript">
+$ (document).ready (function () {
+    function setPage (type, page) {
+        $.get (page, {}, function (reply) {
+            $ ('#intro').html('<article class="module width_full"><header><h3>' + type +
+                    '</h3></header><div class="module_content">' + reply + '</div></article><div class="spacer"></div>');
+        }, "html");
+    }
+    function setEnrolling () {
+        if (webinos.session.getPZHId() === "") {
+            $ ('#enroll-DeEnrollPzp').html ("<a href='#login' id='login'> Enroll Device </a>");
+            $ ("#login").click (function () {
+                setPage ("Connect to your Personal Zone Hub", "login.html");
+            });
+        }  else {
+            $ ('#enroll-DeEnrollPzp').html ("<a href='#login' id='login'> Disconnect Device from Personal Zone </a>");
+        }
+    }
+    function webinosVersion (msg) {
+        var currentVersion = msg.payload.message;
+        $ ("#webinosVersion").html ("Webinos Version: "+currentVersion.tag+"."+currentVersion.num_commit +
+                "(CommitId-"+ currentVersion.commit_id+")");
+    }
+    webinos.session.addListener ('webinosVersion', webinosVersion);
+    function pzhDisconnected () {
+        setEnrolling ();
+        logMessage ("pzp disconnected from pzh, will try connecting back");
+    }
+    webinos.session.addListener ('pzhDisconnected', pzhDisconnected);
+    function connectedDetails () {
+        var pzhId, connectedPzh = [] , connectedPzp = [];
+        connectedPzp = webinos.session.getOtherPZP (); // all connected pzp
+        connectedPzh = webinos.session.getOtherPZH (); // all connected pzh
+        $ ("#enumConnectedPzh").html ("");
+        $ ("#enumConnectedPzp").html ("");
+        var pzhText = "", pzpText = "", style = "connected";
+        for (var i = 0; i < connectedPzh.length; i += 1) {
+            pzhText += "<li><a class='" + style + "'>" + connectedPzh[i] + (connectedPzh[i] === webinos.session.getPZHId()?" (Your Hub)": "")+"</a></li>";
+        }
+        $ ("#enumConnectedPzh").html (pzhText);
+        for (i = 0; i < connectedPzp.length; i += 1) {
+            pzpText += "<li><a class='" + style + "'>" + connectedPzp[i] + (connectedPzp[i] === webinos.session.getPZPId()?" (This Device)": "")+ "</a></li>";
+        }
+        $ ("#enumConnectedPzp").html (pzpText);
+        setEnrolling ();
+    }
+    function fillPZAddrs () {
+        logMessage ('registeredBrowser msg from ' + webinos.session.getPZPId ());
+        connectedDetails ();
+        $ ("#userId").html (webinos.session.getPZPId());
+    }
+    webinos.session.addListener ('registeredBrowser', fillPZAddrs);
+    webinos.session.addListener ('update', connectedDetails);
+    function printInfo (data) {
+        logMessage (data.payload.message);
+    }
+    webinos.session.addListener ('info', printInfo);
+    $("#enroll-DeEnrollPzp").click(function(){
+        if(webinos.session.getPZHId() !== "") { // That means we are enrolled to atleast 1 PZH
+            var sure = confirm("Are you sure you want to reset device?");
+            if (sure) {
+                var options = {type: 'prop', payload: {status:'resetDevice'}};
+                webinos.session.message_send(options);
+            }
+        } else {
+            setEnrolling();
+        }
+    });
+    function logMessage (msg) {
+        if (msg) {
+            $ ('#message').append ('<li>' + msg + '</li>');
+        }
+    }
+    function setArticle(header,body){
+        $('#main').html('<article class="module width_full"><header><h3>' + header + '</h3></header><div class="module_content">'+ body + '</div></article><div class="spacer"></div>');
+    };
+    $ ("#testapi").click (function () {
+        setPage ("Test API Demo", "test.html");
+    });
+    $ ("#login").click (function () {
+        setPage ("Login to your PZH", "login.html");
+    });
+    $ ('#status').mouseenter (function () {
+        var that = $ (this);
+        var right = that.css ("right");
+        that.css ("right", (right === "0px") ? "" : "0px");
+    });
+    $ ('#friendlyName').click (function () {
+        setPage ("Add FriendlyName", "friendlyName.html");
+    });
+    $ ('#infoLog').click (function () {
+        var options = {type:'prop', payload:{status:'infoLog'}};
+        webinos.session.message_send (options);
+    });
+    $ ('#errorLog').click (function () {
+        var options = {type:'prop', payload:{status:'errorLog'}};
+        webinos.session.message_send (options);
+    });
+    function logs (msg) {
+        $ ('#main').html ('<article class="module width_full"><header><h3>Logs</h3></header>' +
+                '<div class="module_content">' + msg.payload.message + '</div></article>' +
+                '<div class="spacer"></div>');
+    }
+    webinos.session.addListener ('infoLog', logs);
+    webinos.session.addListener ('errorLog', logs);
+    function error (msg) {
+        alert (msg.payload.message);
+    }
+    webinos.session.addListener ('error', error);
+    //$('.column').equalHeight(); // Fix height
+});
+</script>
+</head>
+<body>
+<div class="title"> Welcome to your PZP
+    <div class="webinosVersion" id="webinosVersion"> </div>
+</div>
+<div class="intro">
+    <p>Pzp allows your to enroll, connect and share service between your local/remote devices. It allows enforcing
+        policies on services you share. You can also connect to other users and share services with them.</p>
+
+    <div class="wrapper">
+        <div class="connected_pzh" > Connected Pzh</div>
+        <table class="box" cellspacing="10">
+            <tr>
+                <td class="enroll-DeEnrollPzp">
+                    <a class="fill-div" id="enroll-DeEnrollPzp" href="#enroll-DeEnrollPzp"> </a>
+                </td>
+
+                <td class="findInstallWebinosService">
+                    <a href ="./install.html" class="fill-div"> Find Webinos Modules </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="findService">
+                    <a href ="./test.html" class="fill-div"> Test Service </a>
+                </td>
+                <td class="webinosTestBed">
+                    <a href ="./testbed/client.html" class="fill-div"> TestBed </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="webinosAPITests">
+                    <a href ="./testbed/.html" class="fill-div">API Tests</a>
+                </td>
+                <td class="pzpLogs">
+                    <a href ="#resetDevice" id="resetDevice" class="fill-div"> Reset Device </a>
+                </td>
+            </tr>
+        </table>
+        <div class="connected_pzp"> Connected Pzp</div>
+    </div>
+    <div id="status"> STATUS: <span id="message"></span></div>
+</div>
+<div class="footer"><p><strong>Powered by <a href="http://www.webinos.org">webinos</a></strong></p></div>
+<!--<header id="header">
+    <hgroup>
+        <h1 class="site_title"><img src="images/webinosWithBorder.png">PZP TestBed</h1>
+        <h2 class="section_title">Dashboard</h2> -->
+        <!--<div class="btn_view_site"><a href="#logout">Disconnect</a></div>-->
+<!--<div class="btn_view_site"> <a href="#resetDevice" id="resetDevice">DisonnectDevice</a> </div>
+   </hgroup>
+</header> -->
+<!-- end of header bar -->
+<!--<section id="secondary_bar">
+    <div class="user">
+        <p id="userId">Not Connected</p>
+    </div>
+    <div class="breadcrumbs_container">
+        <article class="breadcrumbs"><a href="client.html">Webinos Pzp</a>
+            <div class="breadcrumb_divider"></div>
+            <a class="current">Dashboard</a></article>
+        <div id="webinosVersion"></div>
+    </div>
+</section> -->
+<!-- end of secondary bar -->
+
+<!--
+<aside id="sidebar" class="column">
+    <h3>
+        <ul class="toggle" style="display: block;">
+            <div id="enableLogin"></div>
+        </ul>
+    </h3>
+    <h3>Connected Personal Zones</h3>
+    <ul class="toggle" style="display: block;" id="enumConnectedPzh">
+    </ul>
+    <h3>Connected Devices</h3>
+    <ul class="toggle" style="display: block;" id="enumConnectedPzp">
+    </ul>
+    <h3>APIs</h3>
+    <ul class="toggle" style="">
+        <li> <a href="#testapi" id="testapi"> Test API </a> </li>
+    </ul>
+    <h3> PZP Details</h3>
+    <ul class="toggle" style="">
+        <li><a href="#friendlyName" id="friendlyName"> PZP Friendly Name </a></li>
+        <li><a href="#infoLog" id="infoLog"> Info Logs </a></li>
+        <li><a href="#errorLog" id="errorLog"> Error Logs </a></li>
+    </ul>
+
+</aside>--><!-- end of sidebar -->
+
+<!--<section id="main" class="column">
+    <article class="module width_full">
+        <header><h3>Webinos PZP</h3></header>
+        <div class="module_content">
+            <h1>Welcome to your PZP</h1>
+            <p>This is the main test page for your PZP. </p>
+              <ul> Enroll to the PZH if you are not enrolled. On the left click on "Login to the PZH"</ul>
+        </td>
+
+            <p><b>Please select one of the actions on the left menu</b></p>
+        </div>
+        <div id="loader"></div>
+    </article>--><!-- end of styles article -->
+    <!--<div class="spacer"></div>
+    <div id="status"> STATUS: <span id="message"></span></div>
+</section>-->
+</body>
+</html>

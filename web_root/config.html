@@ -1,0 +1,57 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+<meta charset="utf-8"/>
+<title>PZP Configuration</title>
+<!--<link rel="icon" href="images/webinos.ico" type="image/x-icon">-->
+<link rel="stylesheet" href="css/index.css" type="text/css" media="screen"/>
+<link rel="stylesheet" href="css/jquery.mobile-1.3.0.min.css" />
+<script src="./jquery-1.8.2.min.js"></script>
+<script src="js/jquery.mobile-1.3.0.min.js"></script>
+<script type="text/javascript" src="./webinos.js"></script>
+<script type="text/javascript">
+$ (document).ready (function () {
+});
+</script>
+</head>
+<body>
+<div class="title"> PZP Configuration
+    <div class="webinosVersion" id="webinosVersion"> </div>
+</div>
+<div class="intro">
+    <p> PZP Configuration allows you to set PZP default value.</p>
+    <div class="wrapper">
+        <div class="connected_pzh" > Connected Pzh</div>
+        <table class="box" cellspacing="10">
+            <tr>
+                <td class="enroll-DeEnrollPzp">
+                    <a class="fill-div" id="enroll-DeEnrollPzp" href="#enroll-DeEnrollPzp"> </a>
+                </td>
+
+                <td class="findInstallWebinosService">
+                    <a href ="./install.html" class="fill-div"> Find Webinos Modules </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="findService">
+                    <a href ="./test.html" class="fill-div"> Test Service </a>
+                </td>
+                <td class="webinosTestBed">
+                    <a href ="./testbed/client.html" class="fill-div"> TestBed </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="webinosAPITests">
+                    <a href ="./testbed/.html" class="fill-div">API Tests</a>
+                </td>
+                <td class="pzpLogs">
+                    <a href ="#resetDevice" id="resetDevice" class="fill-div"> Reset Device </a>
+                </td>
+            </tr>
+        </table>
+        <div class="connected_pzp"> Connected Pzp</div>
+    </div>
+    <div id="status"> STATUS: <span id="message"></span></div>
+</div>
+<div class="footer"><p><strong>Powered by <a href="http://www.webinos.org">webinos</a></strong></p></div>
+</body>
+</html>

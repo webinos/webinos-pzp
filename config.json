@@ -1,0 +1,24 @@
+{
+    "ports": {
+        "provider": 80,
+        "provider_webServer": 443,
+        "pzp_webSocket": 8080,
+        "pzp_tlsServer": 8040,
+        "pzp_zeroConf": 4321,
+        "iot": 3000
+    },
+    "pzpDefaultServices": [
+        {
+            "name": "test",
+            "params": {
+                "num": "21"
+            }
+        }
+    ],
+    "friendlyName": "",
+    "webinos_version": {
+        "tag": "v0.8.0",
+        "num_commit": "134",
+        "commit_id": "gd62f210"
+    }
+}

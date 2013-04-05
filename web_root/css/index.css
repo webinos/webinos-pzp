@@ -1,0 +1,179 @@
+body{
+  font-family: 'Ovo', serif;
+}
+.intro {
+    width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    align:"center";
+    color: #411f01;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+}
+p {
+    padding-top: 30px;
+    margin: 0 auto;
+    font-size: 14px;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+
+}
+.title{
+    font-size: 55px;
+    background-color: #e6e6e6;
+    color: #411f01;
+    text-align: left;
+}
+.webinosVersion{
+    font-size: 15px;
+    background-color: #e6e6e6;
+    color: #411f01;
+    text-align: left;
+    font-style: italic;
+}
+
+.wrapper {
+    display: block;
+    vertical-align: middle;
+}
+.connected_pzh {
+    float: left;
+    text-align: center;
+    height:150px;
+    width:150px;
+    background-color:#01305a;
+    border:1px solid #01305a;
+}
+.connected_pzh {
+    float: left;
+    margin: 0 auto;
+    height:250px;
+    width:140px;
+    color: white;
+    background-color:#01305a;
+}
+.connected_pzp {
+    float: left;
+    height:250px;
+    width:140px;
+    color: white;
+    background-color:#01305a;
+}
+
+.box {
+    margin: 0 auto;
+    text-align: center;
+    width: 500px;
+    height: 150px;
+    float: left;
+    padding:10px;
+}
+.enroll-DeEnrollPzp{
+    width:200px;
+    height:75px;
+    background: url("../images/enroll.png");
+    background-size:60px 75px;
+    background-repeat:no-repeat;
+    background-color:#012341;
+    color: #ffffff;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+    padding:20px;
+}
+.findInstallWebinosService{
+    width:200px;
+    height:75px;
+    background: url("../images/findNPM.png");
+    background-size:60px 75px;
+    background-repeat:no-repeat;
+    background-color:#01305a;
+    color: #ffffff;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+    padding:20px;
+}
+.findService{
+    width:200px;
+    height:75px;
+    background: url("../images/testService.png");
+    background-size:60px 75px;
+    background-repeat:no-repeat;
+    background-color:#023e73;
+    color: #ffffff;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+    padding:20px;
+}
+.webinosTestBed{
+    width:200px;
+    height:75px;
+    background: url("../images/testAPI.png");
+    background-size:60px 75px;
+    background-repeat:no-repeat;
+    background-color:#024b8c;
+    color: #ffffff;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+    padding:20px;
+}
+.webinosAPITests{
+    width:200px;
+    height:75px;
+    background: url("../images/testBed.png");
+    background-size:60px 75px;
+    background-repeat:no-repeat;
+    background-color:#0258a5;
+    color: #ffffff;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+    padding:20px;
+}
+.deEnrollPzp{
+    width:200px;
+    height:75px;
+    background: url("../images/remove.png");
+    background-size:60px 75px;
+    background-repeat:no-repeat;
+    background-color:#0366be;
+    color: #ffffff;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+    padding:20px;
+}
+.pzpLogs{
+    width:200px;
+    height:75px;
+    background-color:#0373d7;
+    color: #ffffff;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+    border:1px solid #0373d7;
+    
+}
+.footer{
+    width:100%;
+    font-size: 15px;
+    top: 90%;
+    color: black;
+    text-align: center;
+    position: fixed;
+}
+
+.connectedPzh{
+    top:100px;
+    height:200px;
+    width:200px;
+    text-align:left;
+    background-color:#012341;
+    float: left;
+}
+.connectedPzp{
+    top:350px;
+    height:200px;
+    width:200px;
+    margin-left: 600;
+    text-align:left;
+    background-color:#01305a;
+}
+
+.userDetails{
+
+}
+a {color: #ffffff; text-decoration: none;}
+a.fill-div {
+    display: block;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+}
