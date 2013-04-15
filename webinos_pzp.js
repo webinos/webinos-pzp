@@ -90,8 +90,14 @@ require ("fs").readFile (require ("path").join (__dirname, "config-pzp.json"), f
 
 function initializeWidgetServer () {
     // Widget manager server
-    var wrt = require ("webinos-widget").widgetServer;
-    if (typeof wrt !== "undefined") {
+    var wrt;
+    try {
+        wrt = require ("webinos-widget").widgetServer;
+    } catch(err) {
+        console.log("Webinos widget is missing");
+    }
+
+    if (wrt) {
         // Attempt to start the widget server.
         wrt.start (argv.signedWidgetOnly, argv.enforceWidgetCSP, Pzp.session.getWebinosPorts().pzp_webSocket,
             function (msg, wrtPort) {
