@@ -7,15 +7,8 @@
         "pzp_zeroConf": 4321,
         "iot": 3000
     },
-    "pzpDefaultServices": [
-        {
-            "name": "test",
-            "params": {
-                "num": "21"
-            }
-        }
-    ],
     "friendlyName": "",
+    "retryConnection": 60000,
     "webinos_version": {
         "tag": "v0.8.0",
         "num_commit": "134",

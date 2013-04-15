@@ -121,9 +121,11 @@ function startPzp() {
         testStart(true);
         if (argv.widgetServer) initializeWidgetServer ();
     });
-    pzpInstance.on("PZP_FAILED", function(){
+    pzpInstance.on("PZP_START_FAILED", function(errDetails){
+        console.log(errDetails);
         testStart(false);
     });
+
 }
 function ask(name) {
     process.stdin.resume();

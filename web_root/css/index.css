@@ -1,147 +1,95 @@
 body{
-  font-family: 'Ovo', serif;
-}
-.intro {
-    width: 800px;
-    margin: 0 auto;
-    text-align: center;
-    align:"center";
-    color: #411f01;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
-}
-p {
-    padding-top: 30px;
-    margin: 0 auto;
+    font-family: 'Ovo', serif;
     font-size: 14px;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+    text-align: "center";
+    text-shadow: 0 -1px;
+    margin: 0 auto 0 auto;
+    color: #ffffff;
+    height:100%;
+}
 
+#modalDisplay {
+    display:none; /* starts out hidden */
+    z-index:40001; /* High z-index to ensure it appears above all content */
 }
-.title{
-    font-size: 55px;
+#modalDisplay #modalDisplayOverlay { /* Shades out background when selector is active */
+    position:fixed;
+    width:100%;
+    height:100%;
+    background-color:#01305a;
+    opacity:.8; /* Sets opacity so it's partly transparent */
+    z-index:40001;
+}
+#modalDisplay  #vertical-offset { /* Fixed position to provide the vertical offset */
+    position:fixed;
+    top:10%;
+    width:100%;
+    z-index:40002; /* ensures box appears above overlay */
+}
+#modalDisplay  #modalContents { /* The actual box, centered in the fixed-position div */
+    width:405px;
+    position:relative;
+    margin:0 auto;
+    /*Everything below is just visual styling */
+    background-color:#012341;
+    text-decoration: none;
+    color:#ffffff;
+    padding:10px;
+    border:1px solid white;
+}
+#modalClose {
+    position:absolute;
+    top:-12px; /* Half the icon's height */
+    right:-12px; /* half the icon's width */
+    z-index:40003;
+}
+
+#title {
+    font-size: 30px;
+    text-align: left;
     background-color: #e6e6e6;
     color: #411f01;
-    text-align: left;
 }
-.webinosVersion{
-    font-size: 15px;
+#webinosVersion{
+    font-size: 10px;
     background-color: #e6e6e6;
     color: #411f01;
-    text-align: left;
+    text-align: right;
     font-style: italic;
 }
-
-.wrapper {
-    display: block;
-    vertical-align: middle;
+#container{
+    margin:0;
+    padding-left: 200px;
+    padding-right: 240px;
+    min-width: 240px;
+    color: #ffffff;
 }
-.connected_pzh {
+.column {
+    padding-top: 1em;
     float: left;
-    text-align: center;
-    height:150px;
-    width:150px;
-    background-color:#01305a;
-    border:1px solid #01305a;
-}
-.connected_pzh {
-    float: left;
-    margin: 0 auto;
-    height:250px;
-    width:140px;
-    color: white;
-    background-color:#01305a;
-}
-.connected_pzp {
-    float: left;
-    height:250px;
-    width:140px;
-    color: white;
-    background-color:#01305a;
+    position: relative;
+    height:100%;
 }
 
-.box {
-    margin: 0 auto;
-    text-align: center;
-    width: 500px;
-    height: 150px;
-    float: left;
-    padding:10px;
-}
-.enroll-DeEnrollPzp{
-    width:200px;
-    height:75px;
-    background: url("../images/enroll.png");
-    background-size:60px 75px;
-    background-repeat:no-repeat;
+#left {
+    width: 200px;        /* LC fullwidth - padding */
+    padding: 0 10px;
+    right: 240px;        /* LC fullwidth */
+    margin-left: -100%;
     background-color:#012341;
-    color: #ffffff;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
-    padding:20px;
 }
-.findInstallWebinosService{
-    width:200px;
-    height:75px;
-    background: url("../images/findNPM.png");
-    background-size:60px 75px;
-    background-repeat:no-repeat;
+#center {
+    width: 100%;
+    padding: 0 10px;
     background-color:#01305a;
-    color: #ffffff;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
-    padding:20px;
 }
-.findService{
-    width:200px;
-    height:75px;
-    background: url("../images/testService.png");
-    background-size:60px 75px;
-    background-repeat:no-repeat;
-    background-color:#023e73;
-    color: #ffffff;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
-    padding:20px;
+#right {
+    width: 200px;  /* RC width */
+    padding: 0 10px;
+    margin-right: -100%;
+    background-color:#012341;
 }
-.webinosTestBed{
-    width:200px;
-    height:75px;
-    background: url("../images/testAPI.png");
-    background-size:60px 75px;
-    background-repeat:no-repeat;
-    background-color:#024b8c;
-    color: #ffffff;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
-    padding:20px;
-}
-.webinosAPITests{
-    width:200px;
-    height:75px;
-    background: url("../images/testBed.png");
-    background-size:60px 75px;
-    background-repeat:no-repeat;
-    background-color:#0258a5;
-    color: #ffffff;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
-    padding:20px;
-}
-.deEnrollPzp{
-    width:200px;
-    height:75px;
-    background: url("../images/remove.png");
-    background-size:60px 75px;
-    background-repeat:no-repeat;
-    background-color:#0366be;
-    color: #ffffff;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
-    padding:20px;
-}
-.pzpLogs{
-    width:200px;
-    height:75px;
-    background-color:#0373d7;
-    color: #ffffff;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
-    border:1px solid #0373d7;
-    
-}
-.footer{
+#footer {
     width:100%;
     font-size: 15px;
     top: 90%;
@@ -149,31 +97,33 @@ p {
     text-align: center;
     position: fixed;
 }
-
-.connectedPzh{
-    top:100px;
-    height:200px;
-    width:200px;
-    text-align:left;
-    background-color:#012341;
-    float: left;
+* html #left {
+    left: 150px;           /* RC fullwidth */
 }
-.connectedPzp{
-    top:350px;
-    height:200px;
-    width:200px;
-    margin-left: 600;
-    text-align:left;
+.eachElement{
+    display: block;
     background-color:#01305a;
+    color: #ffffff;
+    text-decoration: none;
+    text-align: center;
+    margin-left: auto ;
+    margin-right: auto ;
+    padding: 10px;
+    border:1px solid #012341;
+    text-transform:uppercase;
 }
-
-.userDetails{
-
-}
-a {color: #ffffff; text-decoration: none;}
 a.fill-div {
+    color:#ffffff;
+    font-weight:bold;
     display: block;
     height: 100%;
     width: 100%;
-    text-align: center;
+    text-decoration:none;
+}
+a.fill-div:visited {
+    color:#ffffff;
+    text-decoration:none;
+}
+a.fill-div:hover {
+    border-bottom:1px solid #e6e6e6;
 }

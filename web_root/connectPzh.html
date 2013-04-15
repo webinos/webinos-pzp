@@ -2,11 +2,10 @@
 <html>
 <head>
   <title>Connect to Your PZH</title>
-  <link rel="stylesheet" type="text/css" href="css/reset.css">
-  <link rel="stylesheet" type="text/css" href="css/structure.css">
-  <link rel="stylesheet" type="text/css" href="css/login.css">
-  <script type="text/javascript" src="./jquery-1.8.2.min.js"></script>
-  <script type="text/javascript" src="../webinos.js"></script>
+  <link rel="stylesheet" href="css/jquery.mobile-1.3.0.min.css" />
+  <script src="js/jquery-1.8.2.min.js"></script>
+  <script src="js/jquery.mobile-1.3.0.min.js"></script>
+  <script type="text/javascript" src="./webinos.js"></script>
   <script type="text/javascript">
     $ (document).ready (function () {
       $ ("#connectPzh").click (function () {
@@ -33,7 +32,7 @@
 <body>
 <form class="box login" id="provider">
   <header>
-    <img src="http://webinos.org/wp-content/themes/parallelus-unite/images/webinos_logo.png" width="100px">
+  <!--  <img src="http://webinos.org/wp-content/themes/parallelus-unite/images/webinos_logo.png" width="100px">-->
     <label>Connect your device to a personal zone hub (PZH) </label>
   </header>
   <fieldset class="boxBody">
@@ -47,9 +46,5 @@
     <submit></submit>
   </fieldset>
 </form>
-<footer id="main">
-  <a href="http://wwww.webinos.org">Powered by webinos</a> | <a href="http://developer.webinos.org">Developer resources
-  on webinos</a>
-</footer>
 </body>
 </html>

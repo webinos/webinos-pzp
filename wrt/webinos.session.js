@@ -17,10 +17,11 @@
 * Copyright 2012 - 2013 Samsung Electronics (UK) Ltd
 * Authors: Habib Virji
 ******************************************************************************/
-
+if (typeof webinos === "undefined") var webinos = {};
+if (typeof webinos.session === "undefined") webinos.session = {};
 (function() {
   "use strict";
-  webinos.session = {};
+
   var sessionId = null, pzpId, pzhId, otherPzp = [], otherPzh = [], isConnected = false, enrolled = false, mode, port = 8080;
   var serviceLocation;
   var listenerMap = {};
@@ -109,22 +110,6 @@
     webinos.session.isConnected = function () {
         return isConnected;
     };
-
-  webinos.session.getSessionId = function() {
-    return sessionId;
-  };
-  webinos.session.getPZPId = function() {
-    return pzpId;
-  };
-  webinos.session.getPZHId = function() {
-    return ( pzhId || "");
-  };
-  webinos.session.getOtherPZP = function() {
-    return (otherPzp || []);
-  };
-  webinos.session.getOtherPZH = function() {
-    return (otherPzh || []);
-  };
   webinos.session.getPzpModeState = function (mode_name) {
     if (enrolled && mode[mode_name] === "connected") {
       return true;
@@ -132,22 +117,7 @@
       return false;
     }
   };
-  webinos.session.addListener = function(statusType, listener) {
-    var listeners = listenerMap[statusType] || [];
-    listeners.push(listener);
-    listenerMap[statusType] = listeners;
-    return listeners.length;
-  };
-  webinos.session.removeListener = function(statusType, id) {
-    var listeners = listenerMap[statusType] || [];
-    try {
-      listeners[id - 1] = undefined;
-    }catch(e) {
-    }
-  };
-  webinos.session.isConnected = function(){
-    return isConnected;
-  };
+
   function callListenerForMsg(data) {
     var listeners = listenerMap[data.payload.status] || [];
     for(var i = 0;i < listeners.length;i++) {
@@ -230,6 +200,9 @@
           break;
         case "pzhDisconnected":
           isConnected = false;
+          callListenerForMsg(data);
+          break;
+        case "gatherTestPageLinks":
           callListenerForMsg(data);
           break;
       }
