@@ -11,8 +11,10 @@
    },
   "directories": {
     "lib": "./lib",
+    "node_modules": "./node_modules",
     "test":"./test"
   },
+  "bundleDependencies":["webinos-api-test"],
   "dependencies":{
     "webinos-certificateHandler": "git://github.com/webinos/webinos-certificateHandler.git",
     "webinos-utilities"  : "git://github.com/webinos/webinos-utilities.git",
