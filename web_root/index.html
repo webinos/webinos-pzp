@@ -45,20 +45,15 @@ $ (document).ready (function () {
     }
 
     function connectedDetails () {
-        var pzhId, connectedPzh = [] , connectedPzp = [];
-        connectedPzp = webinos.session.getOtherPZP (); // all connected pzp
-        connectedPzh = webinos.session.getOtherPZH (); // all connected pzh
-        $ ("#connectedPzh").html("");
-        $ ("#connectedPzp").html("");
-        var pzhText = "ConnectedPzh", pzpText = "ConnectedPzp", style = "connected";
-        for (var i = 0; i < connectedPzh.length; i += 1) {
-            pzhText += "<li><a class='" + style + "'>" + connectedPzh[i] + (connectedPzh[i] === webinos.session.getPZHId()?" (Your Hub)": "")+"</a></li>";
+        var pzhId, connectedDevices = webinos.session.getConnectedDevices(), text="Connected Devices:"; // all connected pzp
+        $ ("#connectedDevices").html("");
+        for (var i = 0; i < connectedDevices.length; i += 1) {
+            text += "<li><a>" + connectedDevices[i].id + (connectedDevices[i].id === webinos.session.getPZHId()?" (Your Hub)": "")+"</a></li>";
+            for (var j=0; j < connectedDevices[i].pzp.length; j = j + 1) {
+                text += "<ul><li><a>" + connectedDevices[i].pzp[j] + (connectedDevices[i].pzp[j] === webinos.session.getPZPId()?" (Your Device)": "")+"</a></li></ul>";
+            }
         }
-        $ ("#connectedPzh").html (pzhText);
-        for (i = 0; i < connectedPzp.length; i += 1) {
-            pzpText += "<li><a class='" + style + "'>" + connectedPzp[i] + (connectedPzp[i] === webinos.session.getPZPId()?" (This Device)": "")+ "</a></li>";
-        }
-        $ ("#connectedPzp").html (pzpText);
+        $ ("#connectedDevices").html(text);
         setEnrolling ();
     }
 
@@ -165,8 +160,7 @@ $ (document).ready (function () {
         <div class="eachElement"><a href="#fetchConfiguration"  id="fetchConfiguration" class="fill-div"> View/Edit PZP Configuration</a></div>
     </div>
     <div class="column" id="right">
-        <div id="connectedPzh"></div>
-        <div id="connectedPzp"></div>
+        <div id="connectedDevices"></div>
     </div>
 </div>
 <div id="footer">

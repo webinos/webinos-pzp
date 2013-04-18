@@ -22,7 +22,7 @@ if (typeof webinos.session === "undefined") webinos.session = {};
 (function() {
     "use strict";
 
-    var sessionId = null, pzpId, pzhId, otherPzp = [], otherPzh = [], isConnected = false, enrolled = false, mode, port = 8080;
+    var sessionId = null, pzpId, pzhId, connectedDevices =[], isConnected = false, enrolled = false, mode, port = 8080;
     var serviceLocation;
     var listenerMap = {};
     var channel;
@@ -88,11 +88,24 @@ if (typeof webinos.session === "undefined") webinos.session = {};
     webinos.session.getPZHId = function () {
         return ( pzhId || "");
     };
-    webinos.session.getOtherPZP = function () {
-        return (otherPzp || []);
+    webinos.session.getConnectedDevices = function () {
+        return (connectedDevices || []);
     };
-    webinos.session.getOtherPZH = function () {
-        return (otherPzh || []);
+    webinos.session.getConnectedPzh = function () {
+       var list =[];
+       for (var i = 0 ; i < connectedDevices.length; i = i + 1){
+           list.push(connectedDevices[i].id);
+       }
+       return list;
+    };
+    webinos.session.getConnectedPzp = function () {
+        var list =[];
+        for (var i = 0 ; i < connectedDevices.length; i = i + 1){
+            for (var j = 0; j < connectedDevices[i].pzp.length; j = j + 1){
+               list.push(connectedDevices[i].pzp[j]);
+            }
+        }
+        return list;
     };
     webinos.session.addListener = function (statusType, listener) {
         var listeners = listenerMap[statusType] || [];
@@ -131,9 +144,8 @@ if (typeof webinos.session === "undefined") webinos.session = {};
     }
     function updateConnected(message){
         pzhId = message.pzhId;
-        otherPzh = message.connectedPzh;
-        otherPzp = message.connectedPzp;
-        isConnected = !!(otherPzh.indexOf(pzhId) !== -1);
+        connectedDevices = message.connectedDevices;
+        isConnected = !!(webinos.session.getConnectedPzh().indexOf(pzhId) !== -1);
         enrolled = message.enrolled;
         mode = message.mode;
     }
