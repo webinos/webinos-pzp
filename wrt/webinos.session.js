@@ -93,17 +93,23 @@ if (typeof webinos.session === "undefined") webinos.session = {};
     };
     webinos.session.getConnectedPzh = function () {
        var list =[];
-       for (var i = 0 ; i < connectedDevices.length; i = i + 1){
+       if(pzhId) {
+         for (var i = 0 ; i < connectedDevices.length; i = i + 1){
            list.push(connectedDevices[i].id);
+         }
        }
        return list;
     };
     webinos.session.getConnectedPzp = function () {
         var list =[];
         for (var i = 0 ; i < connectedDevices.length; i = i + 1){
-            for (var j = 0; j < connectedDevices[i].pzp.length; j = j + 1){
+            if(!pzhId) {
+              list.push(connectedDevices[i]);
+            } else {
+              for (var j = 0; j < connectedDevices[i].pzp.length; j = j + 1){
                list.push(connectedDevices[i].pzp[j]);
-            }
+              }
+           }
         }
         return list;
     };

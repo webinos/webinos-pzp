@@ -48,10 +48,14 @@ $ (document).ready (function () {
         var pzhId, connectedDevices = webinos.session.getConnectedDevices(), text="Connected Devices:"; // all connected pzp
         $ ("#connectedDevices").html("");
         for (var i = 0; i < connectedDevices.length; i += 1) {
-            text += "<li><a>" + connectedDevices[i].id + (connectedDevices[i].id === webinos.session.getPZHId()?" (Your Hub)": "")+"</a></li>";
-            for (var j=0; j < connectedDevices[i].pzp.length; j = j + 1) {
-                text += "<ul><li><a>" + connectedDevices[i].pzp[j] + (connectedDevices[i].pzp[j] === webinos.session.getPZPId()?" (Your Device)": "")+"</a></li></ul>";
-            }
+            if(!webinos.session.getPZHId()) {
+              text += "<li><a>" + connectedDevices[i] + (connectedDevices[i] === webinos.session.getPZPId()?" (Your Device)": "")+"</a></li>";
+            } else {
+              text += "<li><a>" + connectedDevices[i].id + (connectedDevices[i].id === webinos.session.getPZHId()?" (Your Hub)": "")+"</a></li>";
+              for (var j=0; j < connectedDevices[i].pzp.length; j = j + 1) {
+                  text += "<ul><li><a>" + connectedDevices[i].pzp[j] + (connectedDevices[i].pzp[j] === webinos.session.getPZPId()?" (Your Device)": "")+"</a></li></ul>";
+              }
+          }
         }
         $ ("#connectedDevices").html(text);
         setEnrolling ();
