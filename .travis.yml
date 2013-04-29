@@ -1,0 +1,8 @@
+language: node_js
+node_js:
+  - "0.8"
+  - "0.10"
+install: npm install --save-dev
+before_install:
+ - sudo apt-get update -qq
+ - npm i -g jasmine-node node-gyp
