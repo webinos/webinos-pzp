@@ -92,7 +92,7 @@ function initializeWidgetServer () {
     // Widget manager server
     var wrt;
     try {
-        wrt = require ("webinos-widget").widgetServer;
+        wrt = require ("webinos-widget/lib/ui/widgetServer.js");
     } catch(err) {
         console.log("Webinos widget is missing");
     }
