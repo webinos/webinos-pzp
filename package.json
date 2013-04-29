@@ -38,6 +38,6 @@
   },
   "scripts": {
     "install": "node build_webinosJS.js",
-    "test": "./tools/travis/auto-test.sh"
+    "test": "jasmine-node ./test/jasmine"
   }
 }
