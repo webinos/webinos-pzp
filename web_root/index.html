@@ -52,8 +52,10 @@ $ (document).ready (function () {
               text += "<li><a>" + connectedDevices[i] + (connectedDevices[i] === webinos.session.getPZPId()?" (Your Device)": "")+"</a></li>";
             } else {
               text += "<li><a>" + connectedDevices[i].id + (connectedDevices[i].id === webinos.session.getPZHId()?" (Your Hub)": "")+"</a></li>";
-              for (var j=0; j < connectedDevices[i].pzp.length; j = j + 1) {
+              if(connectedDevices[i].pzp){
+                for (var j=0; j < connectedDevices[i].pzp.length; j = j + 1) {
                   text += "<ul><li><a>" + connectedDevices[i].pzp[j] + (connectedDevices[i].pzp[j] === webinos.session.getPZPId()?" (Your Device)": "")+"</a></li></ul>";
+                }
               }
           }
         }
