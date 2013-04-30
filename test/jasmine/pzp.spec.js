@@ -167,7 +167,7 @@ describe("check master and connection certificates/privateKey", function() {
 
     it("check master certificate data", function(){
         expect(certificates.master.key_id).not.toBeNull();
-        expect(certificates.master.key_id).toContain(keyList[0]);
+        expect(certificates.master.key_id).toContain(os.hostname()+"_master");
         expect(pzpInstance.getMasterCertificate()).not.toBeNull();
         expect(pzpInstance.getCertificateToBeSignedByPzh()).not.toBeNull();
         expect(certificates.master.csr).toContain(CERT_REQ_START);
@@ -180,7 +180,7 @@ describe("check master and connection certificates/privateKey", function() {
 
     it("check connection certificate data", function(){
         expect(certificates.conn.key_id).not.toBeNull();
-        expect(certificates.conn.key_id).toContain(keyList[1]);
+        expect(certificates.conn.key_id).toContain(os.hostname()+"_conn");
         expect(certificates.conn.csr).not.toBeNull();
         expect(certificates.conn.csr).toContain(CERT_REQ_START);
         expect(certificates.conn.csr).toContain(CERT_REQ_END);

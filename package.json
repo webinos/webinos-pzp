@@ -38,6 +38,6 @@
   },
   "scripts": {
     "install": "node build_webinosJS.js",
-    "test": "jasmine-node ./test/jasmine"
+    "test": "jasmine-node ./test/jasmine --forceexit"
   }
 }
