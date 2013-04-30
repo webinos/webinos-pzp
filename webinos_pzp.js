@@ -92,7 +92,7 @@ function initializeWidgetServer () {
     // Widget manager server
     var wrt;
     try {
-        wrt = require ("webinos-widget").widgetServer;
+        wrt = require ("webinos-widgetServer");
     } catch(err) {
         console.log("Webinos widget is missing");
     }
@@ -107,7 +107,7 @@ function initializeWidgetServer () {
                     wrtConfig.runtimeWebServerPort = wrtPort;
                     wrtConfig.pzpWebSocketPort = Pzp.session.getWebinosPorts ().pzp_webSocket;
                     wrtConfig.pzpPath = Pzp.session.getWebinosPath ();
-                    require ("fs").writeFile ((require ("path").join (Pzp.session.getWebinosPath (), '../wrt/webinos_runtime.json')),
+                    require ("fs").writeFile ((require ("path").join (Pzp.session.getWebinosPath (), '/wrt/webinos_runtime.json')),
                         JSON.stringify (wrtConfig, null, ' '), function (err) {
                             if (err) {
                                 console.log ('error saving runtime configuration file: ' + err);
