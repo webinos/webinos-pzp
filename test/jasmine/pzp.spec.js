@@ -212,7 +212,38 @@ describe("check if pzp webSocket server is started", function(){
 });
 
 describe("check webSocket localhost connection", function () {
+    var webinos;
     it("websocket client connection", function(done){
+        webinos = require("./webinos.js");
+        done();
+    });
+    it("websocket find service", function(done){
+        setTimeout(function(){
+            webinos.webinos.discovery.findServices(new webinos.ServiceType('http://webinos.org/api/test'),
+                {onFound:function (service) {
+                    expect(service.api).toEqual('http://webinos.org/api/test');
+                    expect(service.displayName).toEqual('Test');
+                    expect(service._testAttr).toEqual('HelloWorld');
+                    service.bindService({onBind:function (service1) {
+                        expect(service1.id).toEqual(service.id),
+                            expect(service1.api).toEqual(service.api),
+                            expect(service1.displayName).toEqual(service.displayName);
+                        expect(typeof service1.get42).toEqual("function");
+                        expect(typeof service1.listenerFor42).toEqual("function");
+                    }});
+                    service.get42('foo', function (result) {
+                        expect(result).toEqual("21 foo");
+                        service.listenerFor42(function (result) {
+                            expect(result).toEqual({ msg: '42' });
+                            done();
+                           }, {opts:"unused"});
+                    });
+                }
+            });
+        },500);
+    });
+});
+/*
         var client = new webSocketClient();
         client.connect("ws://localhost:8080/");
         client.on("connect", function(connection){
@@ -223,27 +254,46 @@ describe("check webSocket localhost connection", function () {
                         console.log("Received: '" + message.utf8Data + "'");
                         var parseData = JSON.parse(message.utf8Data);
                         if(parseData.payload.status === "registeredBrowser") {
-                            expect(parseData.type).toEqual("prop");
-                            expect(parseData.from).toEqual(pzpInstance.getFriendlyName());
-                            expect(parseData.to).not.toBeNull();
-                            expect(parseData.payload.status).toEqual("registeredBrowser");
-                            expect(parseData.payload.message).not.toBeNull();
-                            expect(parseData.payload.message.pzhId).toEqual("");
-                            expect(parseData.payload.message.connectedDevices.length).toEqual(1);
-                            expect(parseData.payload.message.connectedDevices[0]).toEqual(pzpInstance.getFriendlyName());
-                            expect(parseData.payload.message.state.hub).toEqual("not_connected");
-                            expect(parseData.payload.message.state.peer).toEqual("not_connected");
-                            expect(parseData.payload.message.enrolled).toEqual(false);
+                                expect(parseData.type).toEqual("prop");
+                                expect(parseData.from).toEqual(pzpInstance.getFriendlyName());
+                                expect(parseData.to).not.toBeNull();
+                                expect(parseData.payload.status).toEqual("registeredBrowser");
+                                expect(parseData.payload.message).not.toBeNull();
+                                expect(parseData.payload.message.pzhId).toEqual("");
+                                expect(parseData.payload.message.connectedDevices.length).toEqual(1);
+                                expect(parseData.payload.message.connectedDevices[0]).toEqual(pzpInstance.getFriendlyName());
+                                expect(parseData.payload.message.state.hub).toEqual("not_connected");
+                                expect(parseData.payload.message.state.peer).toEqual("not_connected");
+                                expect(parseData.payload.message.enrolled).toEqual(false);
+
+                                var webinos = require("./webinos.js");
+                                webinos.webinos.discovery.findServices(new webinos.ServiceType('http://webinos.org/api/test'),
+                                    {onFound:function (service) {
+                                        console.log(service);
+                                        service.serviceAddress.bindService({onBind:function (service) {
+                                            console.log('TEST API ' + service.api + ' bound.');
+                                        }});
+                                        service.serviceAddress.get42('foo', function (result) {
+                                            console.log(result);
+                                        },
+                                        function (error) {
+                                            console.log(error.code + " " + error.message);
+                                        });
+                                        service.serviceAddress.listenerFor42(function (result) {
+                                            console.log(result.msg);
+                                        }, {opts:"unused"});
+                                    }});
                         } else if(parseData.payload.status === "webinosVersion") {
-                            expect(parseData.type).toEqual("prop");
-                            expect(parseData.from).toEqual(pzpInstance.getFriendlyName());
-                            expect(parseData.to).not.toBeNull();
-                            expect(parseData.payload.status).toEqual("webinosVersion");
-                            expect(parseData.payload.message).not.toBeNull();
-                            expect(parseData.payload.message.tag).not.toBeNull();
-                            expect(parseData.payload.message.num_commit).not.toBeNull();
-                            expect(parseData.payload.message.commit_id).not.toBeNull();
-                            done();
+                                expect(parseData.type).toEqual("prop");
+                                expect(parseData.from).toEqual(pzpInstance.getFriendlyName());
+                                expect(parseData.to).not.toBeNull();
+                                expect(parseData.payload.status).toEqual("webinosVersion");
+                                expect(parseData.payload.message).not.toBeNull();
+                                expect(parseData.payload.message.tag).not.toBeNull();
+                                expect(parseData.payload.message.num_commit).not.toBeNull();
+                                expect(parseData.payload.message.commit_id).not.toBeNull();
+                                done();
+
                         }
                     }
                 });
@@ -256,7 +306,7 @@ describe("check webSocket localhost connection", function () {
        //client.close();
     });
 });
-describe("check other managers", function(){
+/*describe("check other managers", function(){
     it ("check RPC", function () {
 
     });
@@ -275,29 +325,18 @@ describe("check other managers", function(){
     it ("check TLS server is communicable", function () {
 
     });
-});
-/*
-describe("virgin mode service discovery test", function(){
-    it ("test get42", function (done) {
+})
 
-    });
-});
-
-describe("enroll pzp", function(){
-    it ("pzp enrolling", function (done) {
-
-    });
-});
-
-describe("enrolled mode service discovery test", function(){
-    it ("test get42", function (done) {
-
-    });
-});
 
 describe("check reConnectivity", function(){
     it ("test get42", function (done) {
 
     });
 });
-*/
+  */
+
+/*describe("shutdown pzp", function(){
+    it("close pzp", function(){
+        //process.exit();
+    });
+});*/
