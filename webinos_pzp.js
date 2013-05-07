@@ -99,7 +99,7 @@ function initializeWidgetServer () {
 
     if (wrt) {
         // Attempt to start the widget server.
-        wrt.start (argv.signedWidgetOnly, argv.enforceWidgetCSP, Pzp.session.getWebinosPorts().pzp_webSocket,
+        wrt.start (argv.signedWidgetOnly, argv.enforceWidgetCSP, Pzp.session.getWebinosPorts().pzp_webSocket, "webinos",
             function (msg, wrtPort) {
                 if (msg === "startedWRT") {
                     // Write the websocket and widget server ports to file so the renderer can pick them up.
