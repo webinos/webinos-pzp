@@ -145,8 +145,8 @@ if (typeof webinos.session === "undefined") webinos.session = {};
     }
     function setWebinosMessaging() {
         webinos.messageHandler.setOwnSessionId(sessionId);
-        var msg = webinos.messageHandler.createRegisterMessage(sessionId, pzpId);
-        webinos.session.message_send(msg, pzpId);
+        var msg = webinos.messageHandler.createRegisterMessage(pzpId, sessionId);
+        webinos.messageHandler.onMessageReceived(msg, msg.to);
     }
     function updateConnected(message){
         pzhId = message.pzhId;

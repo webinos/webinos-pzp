@@ -1171,12 +1171,9 @@ if (typeof webinos.session === "undefined") webinos.session = {};
             "resp_to":webinos.session.getSessionId(),
             "payload":rpc};
         if(rpc.register !== "undefined" && rpc.register === true) {
-            console.log(rpc);
             channel.send(JSON.stringify(rpc));
         }else {
-            console.log("creating callback");
             console.log("WebSocket Client: Message Sent");
-            console.log(message);
             channel.send(JSON.stringify(message));
         }
     };
@@ -1256,8 +1253,8 @@ if (typeof webinos.session === "undefined") webinos.session = {};
     }
     function setWebinosMessaging() {
         webinos.messageHandler.setOwnSessionId(sessionId);
-        var msg = webinos.messageHandler.createRegisterMessage(sessionId, pzpId);
-        webinos.session.message_send(msg, pzpId);
+        var msg = webinos.messageHandler.createRegisterMessage(pzpId, sessionId);
+        webinos.messageHandler.onMessageReceived(msg, msg.to);
     }
     function updateConnected(message){
         pzhId = message.pzhId;
@@ -1267,7 +1264,6 @@ if (typeof webinos.session === "undefined") webinos.session = {};
         mode = message.mode;
     }
     function setWebinosSession(data){
-        console.log(data);
         sessionId = data.to;
         pzpId = data.from;
         if(data.payload.message) {
@@ -1767,7 +1763,6 @@ if (typeof webinos.session === "undefined") webinos.session = {};
      * @param errorCB Error callback.
      */
     function get42(attr, successCB, errorCB) {
-        console.log(this.id);
         var rpc = webinos.rpcHandler.createRPC(this, "get42", [attr]);
         webinos.rpcHandler.executeRPC(rpc,
             function (params){
