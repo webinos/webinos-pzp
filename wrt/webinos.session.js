@@ -40,21 +40,17 @@ if (typeof webinos.session === "undefined") webinos.session = {};
         channel.send(JSON.stringify(msg));
     };
     webinos.session.message_send = function(rpc, to) {
-        var type, id = Math.floor(Math.random() * 101);
+        var type;
         if(rpc.type !== undefined && rpc.type === "prop") {
             type = "prop";
             rpc = rpc.payload;
         }else {
             type = "JSONRPC";
         }
-        if (typeof rpc.method !== undefined && rpc.method === "ServiceDiscovery.findServices") {
-            id = rpc.params[2];
-        }
         if (typeof to === "undefined") {
             to = pzpId;
         }
         var message = {"type":type,
-            "id":id,
             "from":webinos.session.getSessionId(),
             "to":to,
             "resp_to":webinos.session.getSessionId(),
