@@ -17,6 +17,7 @@
  *******************************************************************************/
 
 var Pzp = require ("./lib/pzp");
+var PzpSession = require("./lib/pzp_sessionHandling.js");
 __EnablePolicyEditor = false;
 
 var argv = require ('optimist')
@@ -122,7 +123,7 @@ function initializeWidgetServer () {
     }
 }
 function startPzp() {
-    var pzpInstance = Pzp.session.getInstance();
+    var pzpInstance = PzpSession.getInstance();
     pzpInstance.on("PZP_STARTED", function(){
         testStart(true);
         if (argv.widgetServer) initializeWidgetServer ();
@@ -166,7 +167,7 @@ function initializePzp (config) {
           startPzp();
       }
    }    */
-    Pzp.session.setInputConfig(config);
+    PzpSession.setInputConfig(config);
     startPzp();
 }
 

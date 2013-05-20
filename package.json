@@ -17,8 +17,10 @@
   "bundleDependencies":["webinos-api-test"],
   "dependencies":{
     "webinos-certificateHandler": "git://github.com/webinos/webinos-certificateHandler.git",
-    "webinos-utilities"  : "git://github.com/webinos/webinos-utilities.git",
-    "webinos-messaging"  : "git://github.com/webinos/webinos-messaging.git",
+    "webinos-utilities"         : "git://github.com/webinos/webinos-utilities.git",
+    "webinos-messaging"         : "git://github.com/webinos/webinos-messaging.git",
+    "webinos-policy"            : "git://github.com/webinos/webinos-policy.git",
+    "webinos-synchronization"   : "git://github.com/webinos/webinos-synchronization.git",
     "webinos-api-serviceDiscovery":"git://github.com/webinos/webinos-api-serviceDiscovery.git",
     "webinos-jsonrpc2"   : "*",
     "xml2js": "0.x.x",
