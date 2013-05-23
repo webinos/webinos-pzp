@@ -7,3 +7,4 @@ before_install:
  - sudo apt-get install -qq g++ libssl-dev gnome-keyring libgnome-keyring-dev
  - npm i -g jasmine-node node-gyp
 after_failure: cat npm-debug.log
+script: npm run-script travis-api-test
