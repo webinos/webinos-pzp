@@ -23,7 +23,6 @@
     "webinos-synchronization"   : "git://github.com/webinos/webinos-synchronization.git",
     "webinos-api-serviceDiscovery":"git://github.com/webinos/webinos-api-serviceDiscovery.git",
     "webinos-jsonrpc2"   : "*",
-    "xml2js": "0.x.x",
     "websocket": "1.0.2",
     "optimist": "x.x.x"
   },
