@@ -39,6 +39,6 @@
   },
   "scripts": {
     "install": "node build_webinosJS.js",
-    "travis-test": "./tools/travis-test.sh"
+    "travis-test": "./test/travis-test.sh"
   }
 }
