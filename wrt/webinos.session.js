@@ -22,10 +22,37 @@ if (typeof webinos.session === "undefined") webinos.session = {};
 (function() {
     "use strict";
 
-    var sessionId = null, pzpId, pzhId, connectedDevices =[], isConnected = false, enrolled = false, mode, port = 8080;
-    var serviceLocation;
-    var listenerMap = {};
-    var channel;
+    var sessionId = null, pzpId, pzhId, connectedDevices =[], isConnected = false, enrolled = false, mode, port = 8080,
+        serviceLocation, webinosVersion,listenerMap = {}, channel;
+    function callListenerForMsg(data) {
+        var listeners = listenerMap[data.payload.status] || [];
+        for(var i = 0;i < listeners.length;i++) {
+            listeners[i](data) ;
+        }
+    }
+    function setWebinosMessaging() {
+        webinos.messageHandler.setOwnSessionId(sessionId);
+        var msg = webinos.messageHandler.createRegisterMessage(pzpId, sessionId);
+        webinos.messageHandler.onMessageReceived(msg, msg.to);
+    }
+    function updateConnected(message){
+        pzhId = message.pzhId;
+        connectedDevices = message.connectedDevices;
+        isConnected = !!(webinos.session.getConnectedPzh().indexOf(pzhId) !== -1);
+        enrolled = message.enrolled;
+        mode = message.mode;
+    }
+    function setWebinosSession(data){
+        sessionId = data.to;
+        pzpId     = data.from;
+        if(data.payload.message) {
+            updateConnected(data.payload.message);
+        }
+        setWebinosMessaging();
+    }
+    function setWebinosVersion(data) {
+        webinosVersion = data.payload.message;
+    }
     webinos.session.setChannel = function(_channel) {
         channel = _channel;
     };
@@ -100,14 +127,26 @@ if (typeof webinos.session === "undefined") webinos.session = {};
         var list =[];
         for (var i = 0 ; i < connectedDevices.length; i = i + 1){
             if(!pzhId) {
-              list.push(connectedDevices[i]);
+              list.push(connectedDevices[i].id);
             } else {
               for (var j = 0; j < connectedDevices[i].pzp.length; j = j + 1){
-               list.push(connectedDevices[i].pzp[j]);
+               list.push(connectedDevices[i].pzp[j].id);
               }
            }
         }
         return list;
+    };
+    webinos.session.getFriendlyName = function(id){
+        for (var i = 0 ; i < connectedDevices.length; i = i + 1){
+            if(connectedDevices[i].id === id) {
+                return connectedDevices[i].friendlyName;
+            }
+            for (var j = 0 ; j < connectedDevices[i].pzp.length; j = j + 1){
+                if(connectedDevices[i].pzp[j].id === id) {
+                    return connectedDevices[i].pzp[j].friendlyName;
+                }
+            }
+        }
     };
     webinos.session.addListener = function (statusType, listener) {
         var listeners = listenerMap[statusType] || [];
@@ -126,39 +165,11 @@ if (typeof webinos.session === "undefined") webinos.session = {};
         return isConnected;
     };
     webinos.session.getPzpModeState = function (mode_name) {
-        if (enrolled && mode[mode_name] === "connected") {
-            return true;
-        } else {
-            return false;
-        }
+        return  (enrolled && mode[mode_name] === "connected");
     };
-
-    function callListenerForMsg(data) {
-        var listeners = listenerMap[data.payload.status] || [];
-        for(var i = 0;i < listeners.length;i++) {
-            listeners[i](data) ;
-        }
-    }
-    function setWebinosMessaging() {
-        webinos.messageHandler.setOwnSessionId(sessionId);
-        var msg = webinos.messageHandler.createRegisterMessage(pzpId, sessionId);
-        webinos.messageHandler.onMessageReceived(msg, msg.to);
-    }
-    function updateConnected(message){
-        pzhId = message.pzhId;
-        connectedDevices = message.connectedDevices;
-        isConnected = !!(webinos.session.getConnectedPzh().indexOf(pzhId) !== -1);
-        enrolled = message.enrolled;
-        mode = message.mode;
-    }
-    function setWebinosSession(data){
-        sessionId = data.to;
-        pzpId = data.from;
-        if(data.payload.message) {
-            updateConnected(data.payload.message);
-        }
-        setWebinosMessaging();
-    }
+    webinos.session.getWebinosVersion = function() {
+        return webinosVersion;
+    };
     webinos.session.handleMsg = function(data) {
         if(typeof data === "object" && data.type === "prop") {
             switch(data.payload.status) {
@@ -210,6 +221,7 @@ if (typeof webinos.session === "undefined") webinos.session = {};
                     callListenerForMsg(data);
                     break;
                 case "webinosVersion":
+                    setWebinosVersion(data);
                     callListenerForMsg(data);
                     break;
                 case "pzhDisconnected":

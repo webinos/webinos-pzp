@@ -324,11 +324,10 @@
      * Handles a JSON RPC request.
      * @param request JSON RPC request object.
      * @param from The sender.
-     * @param msgid An id.
      * @function
      * @private
      */
-    var handleRequest = function (request, from, msgid) {
+    var handleRequest = function (request, from) {
         var isCallbackObject;
 
         var idx = request.method.lastIndexOf('.');
@@ -390,13 +389,13 @@
             var successCallback = function (result) {
                 if (typeof id === 'undefined') return;
                 var rpc = newJSONRPCResponseResult(id, result);
-                that.executeRPC(rpc, undefined, undefined, from, msgid);
+                that.executeRPC(rpc, undefined, undefined, from);
             }
 
             var errorCallback = function (error) {
                 if (typeof id === 'undefined') return;
                 var rpc = newJSONRPCResponseError(id, error);
-                that.executeRPC(rpc, undefined, undefined, from, msgid);
+                that.executeRPC(rpc, undefined, undefined, from);
             }
 
             // registration object (in case of "one request to many responses" use)
@@ -460,28 +459,27 @@
      * Handles a new JSON RPC message (as string)
      * @param message The RPC message coming in.
      * @param from The sender.
-     * @param msgid An id.
      */
-    _RPCHandler.prototype.handleMessage = function (jsonRPC, from, msgid){
+    _RPCHandler.prototype.handleMessage = function (jsonRPC, from){
         logger.log("New packet from messaging");
         logger.log("Response to " + from);
 
         // check if okay by policy
         if (this.checkPolicy) {
-            var isAllowed = this.checkPolicy(jsonRPC, from, msgid);
+            var isAllowed = this.checkPolicy(jsonRPC, from);
             if (!isAllowed) {
                 var rpc = newJSONRPCResponseError(jsonRPC.id, {name: "SecurityError", code: 18, message: "Access has been denied."});
-                this.executeRPC(rpc, undefined, undefined, from, msgid);
+                this.executeRPC(rpc, undefined, undefined, from);
                 return;
             }
         }
 
         if (typeof jsonRPC.method !== 'undefined' && jsonRPC.method != null) {
             // received message is RPC request
-            handleRequest.call(this, jsonRPC, from, msgid);
+            handleRequest.call(this, jsonRPC, from);
         } else {
             // received message is RPC response
-            handleResponse.call(this, jsonRPC, from, msgid);
+            handleResponse.call(this, jsonRPC, from);
         }
     };
 
@@ -748,7 +746,7 @@
     "use strict";
     var logger = console;
     if (typeof module !== "undefined") {
-        var webinos_= require("webinos-utilities").webinosLogging(__filename);
+    logger= require("webinos-utilities").webinosLogging(__filename);
     }
     function logObj(obj, name)	{
         for (var myKey in obj)	{
@@ -944,9 +942,8 @@
      * RPC writer - referto write function in  RPC
      * @param rpc Message body
      * @param to Destination for rpc result to be sent to
-     * @param msgid Message id
      */
-    MessageHandler.prototype.write = function (rpc, to, msgid) {
+	MessageHandler.prototype.write = function (rpc, to) {
         if (!to) throw new Error('to is missing, cannot send message');
 
         var message = {
@@ -954,11 +951,6 @@
             resp_to: this.ownSessionId,
             from: this.ownSessionId
         };
-
-        if (!msgid) {
-            msgid = 1 + Math.floor(Math.random() * 1024);
-        }
-        message.id = msgid;
 
         if (typeof rpc.jsonrpc !== "undefined") {
             message.type = "JSONRPC";
@@ -975,7 +967,7 @@
 
             if (isLocalAppMsg.call(this, message)) {
                 // msg from this pzp to wrt previously connected to this pzp
-                console.log('drop message, wrt disconnected');
+                logger.log('drop message, wrt disconnected');
                 return;
             }
 
@@ -1047,7 +1039,7 @@
 
                     if (isLocalAppMsg.call(this, message)) {
                         // msg from other pzp to wrt previously connected to this pzp
-                        console.log('drop message, wrt disconnected');
+                        logger.log('drop message, wrt disconnected');
                         return;
                     }
 
@@ -1067,23 +1059,17 @@
                 if (message.payload) {
                     if(message.to != message.resp_to) {
                         var from = message.from;
-                        var msgid = message.id;
-                        this.rpcHandler.handleMessage(message.payload, from, msgid);
+						this.rpcHandler.handleMessage(message.payload, from);
                     }
                     else {
                         if (typeof message.payload.method !== "undefined") {
                             var from = message.from;
-                            var msgid = message.id;
-                            this.rpcHandler.handleMessage(message.payload, from, msgid);
+							this.rpcHandler.handleMessage(message.payload, from);
                         }
                         else {
                             if (typeof message.payload.result !== "undefined" || typeof message.payload.error !== "undefined") {
                                 this.rpcHandler.handleMessage(message.payload);
                             }
-                        }
-
-                        if (this.messageCallbacks[message.id]) {
-                            this.messageCallbacks[message.id].onSuccess(message.payload.result);
                         }
                     }
                 }
@@ -1128,15 +1114,62 @@
  * Copyright 2012 - 2013 Samsung Electronics (UK) Ltd
  * Authors: Habib Virji
  ******************************************************************************/
+/*******************************************************************************
+ *  Code contributed to the webinos project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright 2011 Alexander Futasz, Fraunhofer FOKUS
+ * Copyright 2012 - 2013 Samsung Electronics (UK) Ltd
+ * Authors: Habib Virji
+ ******************************************************************************/
 if (typeof webinos === "undefined") var webinos = {};
 if (typeof webinos.session === "undefined") webinos.session = {};
 (function() {
     "use strict";
 
-    var sessionId = null, pzpId, pzhId, connectedDevices =[], isConnected = false, enrolled = false, mode, port = 8080;
-    var serviceLocation;
-    var listenerMap = {};
-    var channel;
+    var sessionId = null, pzpId, pzhId, connectedDevices =[], isConnected = false, enrolled = false, mode, port = 8080,
+        serviceLocation, webinosVersion,listenerMap = {}, channel;
+    function callListenerForMsg(data) {
+        var listeners = listenerMap[data.payload.status] || [];
+        for(var i = 0;i < listeners.length;i++) {
+            listeners[i](data) ;
+        }
+    }
+    function setWebinosMessaging() {
+        webinos.messageHandler.setOwnSessionId(sessionId);
+        var msg = webinos.messageHandler.createRegisterMessage(pzpId, sessionId);
+        webinos.messageHandler.onMessageReceived(msg, msg.to);
+    }
+    function updateConnected(message){
+        pzhId = message.pzhId;
+        connectedDevices = message.connectedDevices;
+        isConnected = !!(webinos.session.getConnectedPzh().indexOf(pzhId) !== -1);
+        enrolled = message.enrolled;
+        mode = message.mode;
+        console.log("************************", sessionId, pzpId, pzhId, connectedDevices, isConnected, enrolled, mode);
+    }
+    function setWebinosSession(data){
+        sessionId = data.to;
+        pzpId     = data.from;
+        if(data.payload.message) {
+            updateConnected(data.payload.message);
+        }
+        setWebinosMessaging();
+    }
+    function setWebinosVersion(data) {
+        webinosVersion = data.payload.message;
+    }
     webinos.session.setChannel = function(_channel) {
         channel = _channel;
     };
@@ -1151,29 +1184,28 @@ if (typeof webinos.session === "undefined") webinos.session = {};
         channel.send(JSON.stringify(msg));
     };
     webinos.session.message_send = function(rpc, to) {
-        var type, id = Math.floor(Math.random() * 101);
+        var type;
         if(rpc.type !== undefined && rpc.type === "prop") {
             type = "prop";
             rpc = rpc.payload;
         }else {
             type = "JSONRPC";
         }
-        if (typeof rpc.method !== undefined && rpc.method === "ServiceDiscovery.findServices") {
-            id = rpc.params[2];
-        }
         if (typeof to === "undefined") {
             to = pzpId;
         }
         var message = {"type":type,
-            "id":id,
             "from":webinos.session.getSessionId(),
             "to":to,
             "resp_to":webinos.session.getSessionId(),
             "payload":rpc};
         if(rpc.register !== "undefined" && rpc.register === true) {
+            console.log(rpc);
             channel.send(JSON.stringify(rpc));
         }else {
+            console.log("creating callback");
             console.log("WebSocket Client: Message Sent");
+            console.log(message);
             channel.send(JSON.stringify(message));
         }
     };
@@ -1212,14 +1244,26 @@ if (typeof webinos.session === "undefined") webinos.session = {};
         var list =[];
         for (var i = 0 ; i < connectedDevices.length; i = i + 1){
             if(!pzhId) {
-                list.push(connectedDevices[i]);
+                list.push(connectedDevices[i].id);
             } else {
                 for (var j = 0; j < connectedDevices[i].pzp.length; j = j + 1){
-                    list.push(connectedDevices[i].pzp[j]);
+                    list.push(connectedDevices[i].pzp[j].id);
                 }
             }
         }
         return list;
+    };
+    webinos.session.getFriendlyName = function(id){
+        for (var i = 0 ; i < connectedDevices.length; i = i + 1){
+            if(connectedDevices[i].id === id) {
+                return connectedDevices[i].friendlyName;
+            }
+            for (var j = 0 ; j < connectedDevices[i].pzp.length; j = j + 1){
+                if(connectedDevices[i].pzp[j].id === id) {
+                    return connectedDevices[i].pzp[j].friendlyName;
+                }
+            }
+        }
     };
     webinos.session.addListener = function (statusType, listener) {
         var listeners = listenerMap[statusType] || [];
@@ -1238,39 +1282,11 @@ if (typeof webinos.session === "undefined") webinos.session = {};
         return isConnected;
     };
     webinos.session.getPzpModeState = function (mode_name) {
-        if (enrolled && mode[mode_name] === "connected") {
-            return true;
-        } else {
-            return false;
-        }
+        return  (enrolled && mode[mode_name] === "connected");
     };
-
-    function callListenerForMsg(data) {
-        var listeners = listenerMap[data.payload.status] || [];
-        for(var i = 0;i < listeners.length;i++) {
-            listeners[i](data) ;
-        }
-    }
-    function setWebinosMessaging() {
-        webinos.messageHandler.setOwnSessionId(sessionId);
-        var msg = webinos.messageHandler.createRegisterMessage(pzpId, sessionId);
-        webinos.messageHandler.onMessageReceived(msg, msg.to);
-    }
-    function updateConnected(message){
-        pzhId = message.pzhId;
-        connectedDevices = message.connectedDevices;
-        isConnected = !!(webinos.session.getConnectedPzh().indexOf(pzhId) !== -1);
-        enrolled = message.enrolled;
-        mode = message.mode;
-    }
-    function setWebinosSession(data){
-        sessionId = data.to;
-        pzpId = data.from;
-        if(data.payload.message) {
-            updateConnected(data.payload.message);
-        }
-        setWebinosMessaging();
-    }
+    webinos.session.getWebinosVersion = function() {
+        return webinosVersion;
+    };
     webinos.session.handleMsg = function(data) {
         if(typeof data === "object" && data.type === "prop") {
             switch(data.payload.status) {
@@ -1322,6 +1338,7 @@ if (typeof webinos.session === "undefined") webinos.session = {};
                     callListenerForMsg(data);
                     break;
                 case "webinosVersion":
+                    setWebinosVersion(data);
                     callListenerForMsg(data);
                     break;
                 case "pzhDisconnected":
@@ -1335,32 +1352,211 @@ if (typeof webinos.session === "undefined") webinos.session = {};
         }
     }
 }());
-//
-// Webinos-Platform/webinos/core/wrt/lib/webinos.servicedisco.js
-//
-// Maintenance records:
-// These inline comments should be incorporated in release notes and removed
-// from here when releasing new versions.
-//
-// Modification implements
-// -- Interface DiscoveryInterface method
-//      PendingOperation findServices(ServiceType serviceType, FindCallBack findCallBack, Options options, Filter filter)
-// -- Interface FindCallBack method
-//      void onError(DOMError error)
-// -- Interface PendingOperation method
-//      void cancel()
-//
+
+/*******************************************************************************
+ * Code contributed to the webinos project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright 2011 Alexander Futasz, Fraunhofer FOKUS
+ ******************************************************************************/
+
+(function() {
+    var WebinosService = function (obj) {
+        this.base = exports.RPCWebinosService;
+        this.base(obj);
+    };
+    WebinosService.prototype = new exports.RPCWebinosService;
+
+    WebinosService.prototype.state = {};
+    WebinosService.prototype.icon = '';
+
+    // stub implementation in case a service module doesn't provide its own bindService
+    WebinosService.prototype.bindService = function(bindCB) {
+        if (typeof bindCB === 'undefined') return;
+
+        if (typeof bindCB.onBind === 'function') {
+            bindCB.onBind(this);
+        }
+    };
+    WebinosService.prototype.bind = WebinosService.prototype.bindService;
+
+    WebinosService.prototype.unbind = function(){};
+
+    exports.WebinosService = WebinosService;
+
+})();
+
+/*******************************************************************************
+ *  Code contributed to the webinos project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright 2011 Alexander Futasz, Fraunhofer FOKUS
+ ******************************************************************************/
+(function() {
+
+    /**
+     * Webinos Get42 service constructor (client side).
+     * @constructor
+     * @param obj Object containing displayName, api, etc.
+     */
+    TestModule = function(obj) {
+        this.base = exports.WebinosService;
+        this.base(obj);
+
+        this._testAttr = "HelloWorld";
+        this.__defineGetter__("testAttr", function (){
+            return this._testAttr + " Success";
+        });
+    };
+
+    TestModule.prototype = new exports.WebinosService;
+
+    /**
+     * To bind the service.
+     * @param bindCB BindCallback object.
+     */
+    TestModule.prototype.bindService = function (bindCB, serviceId) {
+        // actually there should be an auth check here or whatever, but we just always bind
+        this.get42 = get42;
+        this.listenAttr = {};
+        this.listenerFor42 = listenerFor42.bind(this);
+
+        if (typeof bindCB.onBind === 'function') {
+            bindCB.onBind(this);
+        };
+    }
+
+    /**
+     * Get 42.
+     * An example function which does a remote procedure call to retrieve a number.
+     * @param attr Some attribute.
+     * @param successCB Success callback.
+     * @param errorCB Error callback.
+     */
+    function get42(attr, successCB, errorCB) {
+        var rpc = webinos.rpcHandler.createRPC(this, "get42", [attr]);
+        webinos.rpcHandler.executeRPC(rpc,
+            function (params){
+                successCB(params);
+            },
+            function (error){
+                errorCB(error);
+            }
+        );
+    }
+
+    /**
+     * Listen for 42.
+     * An exmaple function to register a listener which is then called more than
+     * once via RPC from the server side.
+     * @param listener Listener function that gets called.
+     * @param options Optional options.
+     */
+    function listenerFor42(listener, options) {
+        var rpc = webinos.rpcHandler.createRPC(this, "listenAttr.listenFor42", [options]);
+
+        // add one listener, could add more later
+        rpc.onEvent = function(obj) {
+            // we were called back, now invoke the given listener
+            listener(obj);
+            webinos.rpcHandler.unregisterCallbackObject(rpc);
+        };
+
+        webinos.rpcHandler.registerCallbackObject(rpc);
+        webinos.rpcHandler.executeRPC(rpc);
+    }
+}());
+/*******************************************************************************
+ * Code contributed to the webinos project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright 2011 Alexander Futasz, Fraunhofer FOKUS
+ ******************************************************************************/
+
 (function () {
     function isOnNode() {
         return typeof module === "object" ? true : false;
-    };
+    }
+
+    // TODO The typeMap is hard-coded here so only these APIs are
+    // supported. In the future this should be improved to support
+    // dynamic APIs.
+    //
+    // APIs should be classified as intrinsic ones and webinos
+    // services. Intrinsic APIs, like Discovery, App2App, should be
+    // provided directly in WRT. webinos service APIs, like Actuator,
+    // Vehicle, which are supposed to be provided with a PZP, should be
+    // found with Discovery implemented in this file.
+    //
+    // That means, intrinsic APIs are released along with WRT and not
+    // acquired with Discovery. Users can invoke them directly just
+    // like using a library. While webinos service APIs will still be
+    // acquired with Discovery.
+    //
+    var typeMap = {};
+    if (typeof ActuatorModule !== 'undefined') typeMap['http://webinos.org/api/actuators'] = ActuatorModule;
+    if (typeof App2AppModule !== 'undefined') typeMap['http://webinos.org/api/app2app'] = App2AppModule;
+    if (typeof AppLauncherModule !== 'undefined') typeMap['http://webinos.org/api/applauncher'] = AppLauncherModule;
+    if (typeof AuthenticationModule !== 'undefined') typeMap['http://webinos.org/api/authentication'] = AuthenticationModule;
+    if (typeof webinos.Context !== 'undefined') typeMap['http://webinos.org/api/context'] = webinos.Context;
+    if (typeof corePZinformationModule !== 'undefined') typeMap['http://webinos.org/api/corePZinformation'] = corePZinformationModule;
+    if (typeof DeviceStatusManager !== 'undefined') typeMap['http://webinos.org/api/devicestatus'] = DeviceStatusManager;
+    if (typeof DiscoveryModule !== 'undefined') typeMap['http://webinos.org/api/discovery'] = DiscoveryModule;
+    if (typeof EventsModule !== 'undefined') typeMap['http://webinos.org/api/events'] = EventsModule;
+    if (webinos.file && webinos.file.Service) typeMap['http://webinos.org/api/file'] = webinos.file.Service;
+    if (typeof MediaContentModule !== 'undefined') typeMap['http://webinos.org/api/mediacontent'] = MediaContentModule;
+    if (typeof NfcModule !== 'undefined') typeMap['http://webinos.org/api/nfc'] = NfcModule;
+    if (typeof WebNotificationModule !== 'undefined') typeMap['http://webinos.org/api/notifications'] = WebNotificationModule;
+    if (typeof WebinosDeviceOrientation !== 'undefined') typeMap['http://webinos.org/api/deviceorientation'] = WebinosDeviceOrientation;
+    if (typeof PaymentModule !== 'undefined') typeMap['http://webinos.org/api/payment'] = PaymentModule;
+    if (typeof Sensor !== 'undefined') typeMap['http://webinos.org/api/sensors'] = Sensor;
+    if (typeof TestModule !== 'undefined') typeMap['http://webinos.org/api/test'] = TestModule;
+    if (typeof TVManager !== 'undefined') typeMap['http://webinos.org/api/tv'] = TVManager;
+    if (typeof Vehicle !== 'undefined') typeMap['http://webinos.org/api/vehicle'] = Vehicle;
+    if (typeof WebinosGeolocation !== 'undefined') typeMap['http://webinos.org/api/w3c/geolocation'] = WebinosGeolocation;
+    if (typeof WebinosGeolocation !== 'undefined') typeMap['http://www.w3.org/ns/api-perms/geolocation'] = WebinosGeolocation; // old feature URI for compatibility
+    if (typeof Contacts !== 'undefined') typeMap['http://www.w3.org/ns/api-perms/contacts'] = Contacts;
+    if (typeof ZoneNotificationModule !== 'undefined') typeMap['http://webinos.org/api/internal/zonenotification'] = ZoneNotificationModule;
+//    if (typeof DiscoveryModule !== 'undefined') typeMap['http://webinos.org/manager/discovery/bluetooth'] = DiscoveryModule;
+    if (typeof oAuthModule !== 'undefined') typeMap['http://webinos.org/mwc/oauth'] = oAuthModule;
 
     /**
      * Interface DiscoveryInterface
      */
     var ServiceDiscovery = function (rpcHandler) {
-        this.registeredServices = 0;
-
         var _webinosReady = false;
         var callerCache = [];
 
@@ -1401,85 +1597,18 @@ if (typeof webinos.session === "undefined") webinos.session = {};
             }, timer);
 
             var success = function (params) {
-                var baseServiceObj = params;
-
                 console.log("servicedisco: service found.");
-
-                // TODO The typeMap is hard-coded here so only these APIs are
-                // supported. In the future this should be improved to support
-                // dynamic APIs.
-                //
-                // APIs should be classified as intrinsic ones and webinos
-                // services. Intrinsic APIs, like Discovery, App2App, should be
-                // provided directly in WRT. webinos service APIs, like Actuator,
-                // Vehicle, which are supposed to be provided with a PZP, should be
-                // found with Discovery implemented in this file.
-                //
-                // That means, intrinsic APIs are released along with WRT and not
-                // acquired with Discovery. Users can invoke them directly just
-                // like using a library. While webinos service APIs will still be
-                // acquired with Discovery.
-                //
-                var typeMap = {};
-                if (typeof webinos.file !== 'undefined' && typeof webinos.file.Service !== 'undefined')
-                    typeMap['http://webinos.org/api/file'] = webinos.file.Service;
-                if (typeof TestModule !== 'undefined') typeMap['http://webinos.org/api/test'] = TestModule;
-                if (typeof ActuatorModule !== 'undefined') {
-                    typeMap['http://webinos.org/api/actuators'] = ActuatorModule;
-                    typeMap['http://webinos.org/api/actuators.linearmotor'] = ActuatorModule;
-                    typeMap['http://webinos.org/api/actuators.switch'] = ActuatorModule;
-                    typeMap['http://webinos.org/api/actuators.rotationalmotor'] = ActuatorModule;
-                    typeMap['http://webinos.org/api/actuators.vibratingmotor'] = ActuatorModule;
-                    typeMap['http://webinos.org/api/actuators.servomotor'] = ActuatorModule;
-                    typeMap['http://webinos.org/api/actuators.swivelmotor'] = ActuatorModule;
-                    typeMap['http://webinos.org/api/actuators.thermostat'] = ActuatorModule;
-                }
-                if (typeof WebNotificationModule !== 'undefined') typeMap['http://webinos.org/api/notifications'] = WebNotificationModule;
-                if (typeof ZoneNotificationModule !== 'undefined') typeMap['http://webinos.org/api/internal/zonenotification'] = ZoneNotificationModule;
-                if (typeof oAuthModule!== 'undefined') typeMap['http://webinos.org/mwc/oauth'] = oAuthModule;
-                if (typeof WebinosGeolocation !== 'undefined') typeMap['http://www.w3.org/ns/api-perms/geolocation'] = WebinosGeolocation;
-                if (typeof WebinosDeviceOrientation !== 'undefined') typeMap['http://webinos.org/api/deviceorientation'] = WebinosDeviceOrientation;
-                if (typeof Vehicle !== 'undefined') typeMap['http://webinos.org/api/vehicle'] = Vehicle;
-                if (typeof EventsModule !== 'undefined') typeMap['http://webinos.org/api/events'] = EventsModule;
-                if (typeof App2AppModule !== 'undefined') typeMap['http://webinos.org/api/app2app'] = App2AppModule;
-                if (typeof AppLauncherModule !== 'undefined') typeMap['http://webinos.org/api/applauncher'] = AppLauncherModule;
-                if (typeof Sensor !== 'undefined') {
-                    typeMap['http://webinos.org/api/sensors'] = Sensor;
-                    typeMap['http://webinos.org/api/sensors.temperature'] = Sensor;
-                    typeMap['http://webinos.org/api/sensors.light'] = Sensor;
-                    typeMap['http://webinos.org/api/sensors.proximity'] = Sensor;
-                    typeMap['http://webinos.org/api/sensors.noise'] = Sensor;
-                    typeMap['http://webinos.org/api/sensors.pressure'] = Sensor;
-                    typeMap['http://webinos.org/api/sensors.humidity'] = Sensor;
-                    typeMap['http://webinos.org/api/sensors.heartratemonitor'] = Sensor;
-                }
-                if (typeof PaymentModule !== 'undefined') typeMap['http://webinos.org/api/payment'] = PaymentModule;
-                if (typeof UserProfileIntModule !== 'undefined') typeMap['UserProfileInt'] = UserProfileIntModule;
-                if (typeof TVManager !== 'undefined') typeMap['http://webinos.org/api/tv'] = TVManager;
-                if (typeof DeviceStatusManager !== 'undefined') typeMap['http://wacapps.net/api/devicestatus'] = DeviceStatusManager;
-                if (typeof Contacts !== 'undefined') typeMap['http://www.w3.org/ns/api-perms/contacts'] = Contacts;
-                if (typeof webinos.Context !== 'undefined') typeMap['http://webinos.org/api/context'] = webinos.Context;
-                //if (typeof DiscoveryModule !== 'undefined') typeMap['http://webinos.org/manager/discovery/bluetooth'] = DiscoveryModule;
-                if (typeof DiscoveryModule !== 'undefined') typeMap['http://webinos.org/api/discovery'] = DiscoveryModule;
-                if (typeof AuthenticationModule !== 'undefined') typeMap['http://webinos.org/api/authentication'] = AuthenticationModule;
-                if (typeof MediaContentModule !== 'undefined') typeMap['http://webinos.org/api/mediacontent'] = MediaContentModule;
-                if (typeof corePZinformationModule !== 'undefined') typeMap['http://webinos.org/api/corePZinformation'] = corePZinformationModule;
-                if (typeof NfcModule !== 'undefined') typeMap['http://webinos.org/api/nfc'] = NfcModule;
-
-                if (isOnNode()) {
-                    try {
-                        var Context = require("webinos-context").Context;
-                        typeMap['http://webinos.org/api/context'] = Context;
-                    } catch(err) {
-
-                    }
-                }
-
-                var ServiceConstructor = typeMap[baseServiceObj.api];
-                if (typeof ServiceConstructor !== 'undefined') {
+                var baseServiceObj = params;
+	
+                // reduce feature uri to base form, e.g. http://webinos.org/api/sensors
+                // instead of http://webinos.org/api/sensors.light etc.
+                var stype = /(?:.*(?:\/[\w]+)+)/.exec(baseServiceObj.api);
+                stype = stype ? stype[0] : undefined;
+console.log(typeMap);
+                var ServiceConstructor = typeMap[stype];
+                if (ServiceConstructor) {
                     // elevate baseServiceObj to usable local WebinosService object
                     var service = new ServiceConstructor(baseServiceObj, rpcHandler);
-                    this.registeredServices++;
                     findOp.found = true;
                     callback.onFound(service);
                 } else {
@@ -1512,17 +1641,6 @@ if (typeof webinos.session === "undefined") webinos.session = {};
                 rpc.serviceAddress = rpcHandler.parent.config.pzhId;
             } else {
                 rpc.serviceAddress = webinos.session.getServiceLocation();
-            }
-
-            // TODO Need to check how to handle it. The serviceType BlobBuilder is
-            // not in the API spec.
-            // Pure local services.
-            if (serviceType == "BlobBuilder") {
-                this.found =true;
-                var tmp = new BlobBuilder();
-                this.registeredServices++;
-                callback.onFound(tmp);
-                return findOp;
             }
 
             if (!isOnNode() && !_webinosReady) {
@@ -1580,46 +1698,8 @@ if (typeof webinos.session === "undefined") webinos.session = {};
         };
     }
 
-
-    ///////////////////// WEBINOS SERVICE INTERFACE ///////////////////////////
-
-    // TODO decide what to do with this class.
-    WebinosService = function (obj) {
-        this.base = exports.RPCWebinosService;
-        this.base(obj);
-
-//        this.id = Math.floor(Math.random()*101);
-    };
-    WebinosService.prototype = new exports.RPCWebinosService;
-
-    WebinosService.prototype.state = "";
-
-//    WebinosService.prototype.api = "";
-
-//    WebinosService.prototype.id = "";
-
-//    WebinosService.prototype.displayName = "";
-
-//    WebinosService.prototype.description = "";
-
-    WebinosService.prototype.icon = "";
-
-    // stub implementation in case a service module doesn't provide its own bindService
-    WebinosService.prototype.bindService = function(bindCB) {
-        if (typeof bindCB === 'undefined') return;
-
-        if (typeof bindCB.onBind === 'function') {
-            bindCB.onBind(this);
-        }
-    };
-
-    WebinosService.prototype.unbind = function() {
-        webinos.discovery.registeredServices--;
-        if (channel != null && webinos.discovery.registeredServices > 0) {
-            channel.close();
-            channel = null;
-        }
-    };
+    webinos.discovery = new ServiceDiscovery (webinos.rpcHandler);
+    webinos.ServiceDiscovery = webinos.discovery; // for backward compat
 }());
 /*******************************************************************************
  *  Code contributed to the webinos project
@@ -1681,7 +1761,7 @@ if (typeof webinos.session === "undefined") webinos.session = {};
         channel.on("connect",function(connection) {
             webinos.session.setChannel (connection);
             connection.on("message",function (ev) {
-                console.log ('WebSocket Client: Message Received : ' + ev.utf8Data);
+                console.log ('*****************WebSocket Client: Message Received : ' + ev.utf8Data);
                 var data = JSON.parse (ev.utf8Data);
                 if (data.type === "prop") {
                     webinos.session.handleMsg (data);
@@ -1704,95 +1784,4 @@ if (typeof webinos.session === "undefined") webinos.session = {};
     exports.webinos = webinos;
 
 } ());
-/*******************************************************************************
- *  Code contributed to the webinos project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * Copyright 2011 Alexander Futasz, Fraunhofer FOKUS
- ******************************************************************************/
-(function() {
 
-    /**
-     * Webinos Get42 service constructor (client side).
-     * @constructor
-     * @param obj Object containing displayName, api, etc.
-     */
-    TestModule = function(obj) {
-        this.base = WebinosService;
-        this.base(obj);
-
-        this._testAttr = "HelloWorld";
-        this.__defineGetter__("testAttr", function (){
-            return this._testAttr + " Success";
-        });
-    };
-
-    TestModule.prototype = new WebinosService;
-
-    /**
-     * To bind the service.
-     * @param bindCB BindCallback object.
-     */
-    TestModule.prototype.bindService = function (bindCB, serviceId) {
-        // actually there should be an auth check here or whatever, but we just always bind
-        this.get42 = get42;
-        this.listenAttr = {};
-        this.listenerFor42 = listenerFor42.bind(this);
-
-        if (typeof bindCB.onBind === 'function') {
-            bindCB.onBind(this);
-        };
-    }
-
-    /**
-     * Get 42.
-     * An example function which does a remote procedure call to retrieve a number.
-     * @param attr Some attribute.
-     * @param successCB Success callback.
-     * @param errorCB Error callback.
-     */
-    function get42(attr, successCB, errorCB) {
-        var rpc = webinos.rpcHandler.createRPC(this, "get42", [attr]);
-        webinos.rpcHandler.executeRPC(rpc,
-            function (params){
-                successCB(params);
-            },
-            function (error){
-                errorCB(error);
-            }
-        );
-    }
-
-    /**
-     * Listen for 42.
-     * An exmaple function to register a listener which is then called more than
-     * once via RPC from the server side.
-     * @param listener Listener function that gets called.
-     * @param options Optional options.
-     */
-    function listenerFor42(listener, options) {
-        var rpc = webinos.rpcHandler.createRPC(this, "listenAttr.listenFor42", [options]);
-
-        // add one listener, could add more later
-        rpc.onEvent = function(obj) {
-            // we were called back, now invoke the given listener
-            listener(obj);
-            webinos.rpcHandler.unregisterCallbackObject(rpc);
-        };
-
-        webinos.rpcHandler.registerCallbackObject(rpc);
-        webinos.rpcHandler.executeRPC(rpc);
-    }
-
-}());
