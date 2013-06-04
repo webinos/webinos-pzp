@@ -130,6 +130,16 @@ function startPzp() {
     pzpInstance.on("PZP_STARTED", function(){
         testStart(true);
         if (argv.widgetServer) initializeWidgetServer ();
+	
+   	    if (process.platform == 'android') {
+            try { widgetLibrary = require('../webinos-widget/index.js'); } catch(e) { widgetLibrary = null; }
+            if(widgetLibrary) {
+                /* start up the Android-side widgetmanager service */
+                process.env.WRT_HOME = '/data/data/org.webinos.app/wrt';
+                var bridgewm = require('bridge').load('org.webinos.app.wrt.mgr.WidgetManagerImpl', this);
+                bridgewm.setWidgetProcessor(widgetLibrary.widgetmanager);
+            }
+        }
     });
     pzpInstance.on("PZP_START_FAILED", function(errDetails){
         console.log(errDetails);
