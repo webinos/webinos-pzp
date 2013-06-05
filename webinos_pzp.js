@@ -131,8 +131,8 @@ function startPzp() {
         testStart(true);
         if (argv.widgetServer) initializeWidgetServer ();
 	
-   	    if (process.platform == 'android') {
-            try { widgetLibrary = require('../webinos-widget/index.js'); } catch(e) { widgetLibrary = null; }
+        if (process.platform == 'android') {
+            try { widgetLibrary = require('webinos-widget'); } catch(e) { widgetLibrary = null; }
             if(widgetLibrary) {
                 /* start up the Android-side widgetmanager service */
                 process.env.WRT_HOME = '/data/data/org.webinos.app/wrt';
