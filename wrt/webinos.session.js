@@ -127,9 +127,9 @@ if (typeof webinos.session === "undefined") webinos.session = {};
         var list =[];
         for (var i = 0 ; i < connectedDevices.length; i = i + 1){
             if(!pzhId) {
-              list.push(connectedDevices[i].id);
+              list.push(connectedDevices[i]);
             } else {
-              for (var j = 0; j < connectedDevices[i].pzp.length; j = j + 1){
+              for (var j = 0; j < (connectedDevices[i].pzp && connectedDevices[i].pzp.length); j = j + 1){
                list.push(connectedDevices[i].pzp[j].id);
               }
            }
@@ -138,10 +138,10 @@ if (typeof webinos.session === "undefined") webinos.session = {};
     };
     webinos.session.getFriendlyName = function(id){
         for (var i = 0 ; i < connectedDevices.length; i = i + 1){
-            if(connectedDevices[i].id === id) {
+            if(connectedDevices[i] === id || connectedDevices[i].id === id) {
                 return connectedDevices[i].friendlyName;
             }
-            for (var j = 0 ; j < connectedDevices[i].pzp.length; j = j + 1){
+            for (var j = 0 ; j < (connectedDevices[i].pzp && connectedDevices[i].pzp.length); j = j + 1){
                 if(connectedDevices[i].pzp[j].id === id) {
                     return connectedDevices[i].pzp[j].friendlyName;
                 }

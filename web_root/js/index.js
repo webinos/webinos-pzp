@@ -40,12 +40,13 @@ $ (document).ready (function () {
         $ ("#connectedDevices").html("");
         for (var i = 0; i < connectedDevices.length; i += 1) {
             if(!webinos.session.getPZHId()) {
-                text += "<li><a>" + connectedDevices[i] + (connectedDevices[i] === webinos.session.getPZPId()?" (Your Device)": "")+"</a></li>";
+                text += "<li><a>" + webinos.session.getFriendlyName(connectedDevices[i].id) + (connectedDevices[i] === webinos.session.getPZPId()?" (Your Device)": "")+"</a></li>";
             } else {
-                text += "<li><a>" + connectedDevices[i].id + (connectedDevices[i].id === webinos.session.getPZHId()?" (Your Hub)": "")+"</a></li>";
+                console.log(connectedDevices[i]);
+                text += "<li><a>" + webinos.session.getFriendlyName(connectedDevices[i].id) + (connectedDevices[i].id === webinos.session.getPZHId()?" (Your Hub)": "")+"</a></li>";
                 if(connectedDevices[i].pzp){
                     for (var j=0; j < connectedDevices[i].pzp.length; j = j + 1) {
-                        text += "<ul><li><a>" + connectedDevices[i].pzp[j] + (connectedDevices[i].pzp[j] === webinos.session.getPZPId()?" (Your Device)": "")+"</a></li></ul>";
+                        text += "<ul><li><a>" + webinos.session.getFriendlyName(connectedDevices[i].pzp[j].id) + (connectedDevices[i].pzp[j].id === webinos.session.getPZPId()?" (Your Device)": "")+"</a></li></ul>";
                     }
                 }
             }
@@ -55,8 +56,8 @@ $ (document).ready (function () {
     }
 
     function fillPZAddrs () {
-        logMessage ('registeredBrowser msg from ' + webinos.session.getPZPId ());
-        $ ("#title").html ("Welcome to your "+webinos.session.getPZPId());
+        logMessage ('registeredBrowser msg from ' + webinos.session.getFriendlyName(webinos.session.getPZPId ()));
+        $ ("#title").html ("Welcome to your "+webinos.session.getFriendlyName(webinos.session.getPZPId()));
         connectedDetails();
         getLinks();
     }

@@ -27,7 +27,7 @@ body{
     z-index:40002; /* ensures box appears above overlay */
 }
 #modalDisplay  #modalContents { /* The actual box, centered in the fixed-position div */
-    width:80%;
+    width:405px;
     position:relative;
     margin:0 auto;
     /*Everything below is just visual styling */
@@ -36,13 +36,11 @@ body{
     color:#ffffff;
     padding:10px;
     border:1px solid white;
-    overflow-x:auto;
-    overflow-y:auto;
 }
 #modalClose {
     position:absolute;
-    top:-8px; /* Half the icon's height */
-    right:-8px; /* half the icon's width */
+    top:-12px; /* Half the icon's height */
+    right:-12px; /* half the icon's width */
     z-index:40003;
 }
 
