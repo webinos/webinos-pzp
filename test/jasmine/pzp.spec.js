@@ -152,7 +152,7 @@ describe("Create a VIRGIN PZP", function(){
     it ("SessionId = Device name in virgin mode", function() {
         expect(pzpInstance.getSessionId()).not.toBeNull();
         expect(pzpInstance.getDeviceName()).not.toBeNull();
-        expect(pzpInstance.getDeviceName()).toEqual((os.hostname()).substing(0,34)); // Device Name should equal device hostname.
+        expect(pzpInstance.getDeviceName()).toEqual((os.hostname()).substring(0,34)); // Device Name should equal device hostname.
         expect("D"+pzpInstance.getDeviceName()).toEqual(pzpInstance.getSessionId());// in virgin mode they should be equal
         expect(pzp_api.getDeviceName()).toEqual(pzpInstance.getDeviceName());// PZP exposed API should equal instance value
         expect(pzp_api.getSessionId()).toEqual(pzpInstance.getSessionId());
