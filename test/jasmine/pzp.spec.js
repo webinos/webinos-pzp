@@ -518,3 +518,45 @@ describe("Create Multiple PZH and do certificate exchange between them", functio
         findServicePzp(1);
     }, numberOfPZH * 1500); // It takes extra time as more hops are involved
 });
+
+describe("machine with long Pzp Name", function(){
+   it("create pzp with long name and enroll with pzh", function(done){
+       var user = {emails: [{value:"hello0@webinos.org"}],displayName: "Hello#0",from: "google"};
+
+       var inputConfig = {
+           "friendlyName":"Linux Device #longName",
+           "forcedDeviceName":"machinethatissupportingpzplongnametesting"
+       };
+       pzp_api.setInputConfig(inputConfig);
+       var pzpInstance= pzp_api.getInstance();
+       pzpInstance.on("PZP_STARTED",function(){
+           var pzhConnection = require("tls").connect(providerPort, pzhAddress, pzhWebCertificates,
+           function() {
+               enrollPzp(pzhConnection, user, pzpInstance);
+               pzhConnection.on("data", function (_buffer) {
+                   wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                       if (obj&& obj.payload && obj.payload.message && obj.payload.message.payload && obj.payload.message.payload.status === "signedCertByPzh"){
+                           expect(obj.payload.message.from).toEqual(pzhAddress+":"+pzpInstance.getWebinosPorts().provider_webServer+"_hello0@webinos.org");
+                           expect(obj.payload.message.to).toEqual(pzhAddress+":"+pzpInstance.getWebinosPorts().provider_webServer+"_hello0@webinos.org/D"+pzpInstance.getDeviceName());
+                           expect(obj.payload.message.payload.status).toEqual("signedCertByPzh");
+                           expect(obj.payload.message.payload.message.clientCert).toContain(CERT_START);
+                           expect(obj.payload.message.payload.message.masterCert).toContain(CERT_START);
+                           expect(obj.payload.message.payload.message.masterCrl).toContain(CRL_START);
+                           pzpInstance.pzpEnrollment(obj.payload.message.from, obj.payload.message.to, obj.payload.message.payload.message);
+                           pzpInstance.connectHub();
+                           pzpInstance.on("HUB_CONNECTED", function(){
+                               setTimeout(function(){
+                                   var addressLookService = pzhAddress+":"+providerWebServer + "_hello0@webinos.org"; // Find Service at PZH
+                                   findService(addressLookService,function(){
+                                     pzhConnection.socket.end();
+                                     done();
+                                   });
+                               },50); // Time Before everything get started....
+                           });
+                       }
+                   });
+               });
+           });
+       });
+   });
+});
