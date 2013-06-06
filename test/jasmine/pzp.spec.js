@@ -152,7 +152,7 @@ describe("Create a VIRGIN PZP", function(){
     it ("SessionId = Device name in virgin mode", function() {
         expect(pzpInstance.getSessionId()).not.toBeNull();
         expect(pzpInstance.getDeviceName()).not.toBeNull();
-        expect(pzpInstance.getDeviceName()).toEqual(os.hostname()); // Device Name should equal device hostname.
+        expect(pzpInstance.getDeviceName()).toEqual((os.hostname()).substing(0,34)); // Device Name should equal device hostname.
         expect("D"+pzpInstance.getDeviceName()).toEqual(pzpInstance.getSessionId());// in virgin mode they should be equal
         expect(pzp_api.getDeviceName()).toEqual(pzpInstance.getDeviceName());// PZP exposed API should equal instance value
         expect(pzp_api.getSessionId()).toEqual(pzpInstance.getSessionId());
@@ -228,7 +228,7 @@ describe("Master and connection certificates/privateKey", function() {
 
     it("Master certificate", function(){
         expect(certificates.master.key_id).not.toBeNull();
-        expect(certificates.master.key_id).toContain(os.hostname()+"_master");
+        expect(certificates.master.key_id).toContain(pzpInstance.getDeviceName()+"_master");
         expect(pzpInstance.getMasterCertificate()).not.toBeNull();
         expect(pzpInstance.getCertificateToBeSignedByPzh()).not.toBeNull();
         expect(certificates.master.csr).toContain(CERT_REQ_START);
@@ -241,7 +241,7 @@ describe("Master and connection certificates/privateKey", function() {
 
     it("Connection certificate", function(){
         expect(certificates.conn.key_id).not.toBeNull();
-        expect(certificates.conn.key_id).toContain(os.hostname()+"_conn");
+        expect(certificates.conn.key_id).toContain(pzpInstance.getDeviceName()+"_conn");
         expect(certificates.conn.csr).not.toBeNull();
         expect(certificates.conn.csr).toContain(CERT_REQ_START);
         expect(certificates.conn.csr).toContain(CERT_REQ_END);
