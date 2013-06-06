@@ -46,10 +46,10 @@ if [ -d "$WEBINOS_PZH_DATA" ]; then
   echo "Deleted directory $WEBINOS_PZH_DATA"
 fi
 
-if [ ! -d $WEBINOS_PZH_DIR ]; then
-  npm install git://github.com/webinos/webinos-pzh.git
+#if [ ! -d $WEBINOS_PZH_DIR ]; then
+  npm install git://github.com/habibvirji/webinos-pzh.git
   echo "Installed the PZH and its dependencies"
-fi
+#fi
 
 cd $WEBINOS_PZH_DIR
 prepare_pzh_config "config.json"
