@@ -1,11 +1,11 @@
 { "name": "webinos-pzp",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Webinos device functionality is implemented in PZP",
   "main": "./lib/pzp_sessionHandling.js",
-  "author": "Habib Virji  <habib.virji@samsung.com>",  
+  "author": "Habib Virji  <habib.virji@samsung.com>",
   "homepage": "http://www.webinos.org",
   "bugs": "http://jira.webinos.org",
-  "repositories": 
+  "repositories":
    { "type": "git",
      "url": "git://github.com/webinos/webinos-pzp.git"
    },
@@ -17,18 +17,18 @@
   "bundleDependencies":["webinos-api-test"],
   "dependencies":{
     "webinos-certificateHandler": "git://github.com/webinos/webinos-certificateHandler.git",
-    "webinos-utilities"  : "git://github.com/webinos/webinos-utilities.git",
-    "webinos-messaging"  : "git://github.com/webinos/webinos-messaging.git",
-    "webinos-policy"     : "git://github.com/webinos/webinos-policy.git",
+    "webinos-utilities"         : "git://github.com/webinos/webinos-utilities.git",
+    "webinos-messaging"         : "git://github.com/webinos/webinos-messaging.git",
+    "webinos-policy"            : "git://github.com/webinos/webinos-policy.git",
+    "webinos-synchronization"   : "git://github.com/webinos/webinos-synchronization.git",
     "webinos-api-serviceDiscovery":"git://github.com/webinos/webinos-api-serviceDiscovery.git",
     "webinos-jsonrpc2"   : "*",
-    "xml2js": "0.x.x",
     "websocket": "1.0.2",
     "optimist": "x.x.x"
   },
   "devDependencies": {
     "jasmine-node": "1.x.x"
-  },  
+  },
   "engines": {
     "node": ">= 0.6.0",
     "npm": ">= 1.1.17"
@@ -39,6 +39,6 @@
   },
   "scripts": {
     "install": "node build_webinosJS.js",
-    "test": "./tools/travis/auto-test.sh"
+    "travis-test": "./test/travis-test.sh"
   }
 }
