@@ -61,7 +61,6 @@ function findService(address, callback){
             expect(service.displayName).toEqual('Test');
             expect(service._testAttr).toEqual('HelloWorld');
             // POLICY: Check WRT POLICY
-            console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",service.serviceAddress, address);
             if(service.serviceAddress === address) {
                 service.bindService({onBind:function (service1) {
                     expect(service1.id).toEqual(service.id),
@@ -153,7 +152,7 @@ describe("Create a VIRGIN PZP", function(){
         expect(pzpInstance.getSessionId()).not.toBeNull();
         expect(pzpInstance.getDeviceName()).not.toBeNull();
         expect(pzpInstance.getDeviceName()).toEqual((os.hostname()).substring(0,34)); // Device Name should equal device hostname.
-        expect("D"+pzpInstance.getDeviceName()).toEqual(pzpInstance.getSessionId());// in virgin mode they should be equal
+        expect(pzpInstance.getDeviceName()).toEqual(pzpInstance.getSessionId());// in virgin mode they should be equal
         expect(pzp_api.getDeviceName()).toEqual(pzpInstance.getDeviceName());// PZP exposed API should equal instance value
         expect(pzp_api.getSessionId()).toEqual(pzpInstance.getSessionId());
     });
@@ -341,7 +340,7 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
                         expect(obj.user.displayName).toEqual("Hello#0");
                         expect(obj.payload.type).toEqual("csrAuthCodeByPzp");
                         expect(obj.payload.message.from).toEqual(pzhAddress+":"+pzpInstance.getWebinosPorts().provider_webServer+"_hello0@webinos.org");
-                        expect(obj.payload.message.to).toEqual(pzhAddress+":"+pzpInstance.getWebinosPorts().provider_webServer+"_hello0@webinos.org/D"+pzpInstance.getDeviceName());
+                        expect(obj.payload.message.to).toEqual(pzhAddress+":"+pzpInstance.getWebinosPorts().provider_webServer+"_hello0@webinos.org/"+pzpInstance.getDeviceName());
                         expect(obj.payload.message.payload.status).toEqual("signedCertByPzh");
                         expect(obj.payload.message.payload.message.clientCert).not.toBeNull();
                         expect(obj.payload.message.payload.message.clientCert).toContain(CERT_START);
@@ -392,7 +391,7 @@ describe("Create "+numberOfPZP+" PZP and Enroll with the Same PZH ", function(){
                       wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                           if (obj&& obj.payload && obj.payload.message && obj.payload.message.payload && obj.payload.message.payload.status === "signedCertByPzh"){
                               expect(obj.payload.message.from).toEqual(pzhAddress+":"+pzpInstance.getWebinosPorts().provider_webServer+"_hello0@webinos.org");
-                              expect(obj.payload.message.to).toEqual(pzhAddress+":"+pzpInstance.getWebinosPorts().provider_webServer+"_hello0@webinos.org/D"+pzpInstance.getDeviceName());
+                              expect(obj.payload.message.to).toEqual(pzhAddress+":"+pzpInstance.getWebinosPorts().provider_webServer+"_hello0@webinos.org/"+pzpInstance.getDeviceName());
                               expect(obj.payload.message.payload.status).toEqual("signedCertByPzh");
                               expect(obj.payload.message.payload.message.clientCert).toContain(CERT_START);
                               expect(obj.payload.message.payload.message.masterCert).toContain(CERT_START);
@@ -401,7 +400,7 @@ describe("Create "+numberOfPZP+" PZP and Enroll with the Same PZH ", function(){
                               pzpInstance.connectHub();
                               pzpInstance.on("HUB_CONNECTED", function(){
                                   setTimeout(function(){
-                                      var addressLookService = pzhAddress+":"+providerWebServer + "_hello0@webinos.org/Dmachine_"+ ((i === 0 )?0: (i-1)); // Find Service at other PZP
+                                      var addressLookService = pzhAddress+":"+providerWebServer + "_hello0@webinos.org/machine_"+ ((i === 0 )?0: (i-1)); // Find Service at other PZP
                                       findService(addressLookService,function(){
                                           pzhConnection.socket.end();
                                           if ((i+1) < numberOfPZP) createPzpEnroll(i + 1);
@@ -506,7 +505,7 @@ describe("Create Multiple PZH and do certificate exchange between them", functio
         // So findService from PZHA about PZHB services...
         function findServicePzp(i) {
             setTimeout(function(){
-                var address = pzhAddress+":"+providerWebServer + "_hello"+i+"@webinos.org/Dmachine_"+ (numberOfPZP+i);
+                var address = pzhAddress+":"+providerWebServer + "_hello"+i+"@webinos.org/machine_"+ (numberOfPZP+i);
                 findService(address, function(status){
                     expect(status).toBeTruthy();
                     if ((i + 1) < numberOfPZH) findServicePzp(i+1);
@@ -537,7 +536,7 @@ describe("machine with long Pzp Name", function(){
                    wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                        if (obj&& obj.payload && obj.payload.message && obj.payload.message.payload && obj.payload.message.payload.status === "signedCertByPzh"){
                            expect(obj.payload.message.from).toEqual(pzhAddress+":"+pzpInstance.getWebinosPorts().provider_webServer+"_hello0@webinos.org");
-                           expect(obj.payload.message.to).toEqual(pzhAddress+":"+pzpInstance.getWebinosPorts().provider_webServer+"_hello0@webinos.org/D"+pzpInstance.getDeviceName());
+                           expect(obj.payload.message.to).toEqual(pzhAddress+":"+pzpInstance.getWebinosPorts().provider_webServer+"_hello0@webinos.org/"+pzpInstance.getDeviceName());
                            expect(obj.payload.message.payload.status).toEqual("signedCertByPzh");
                            expect(obj.payload.message.payload.message.clientCert).toContain(CERT_START);
                            expect(obj.payload.message.payload.message.masterCert).toContain(CERT_START);
