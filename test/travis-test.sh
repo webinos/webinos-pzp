@@ -47,7 +47,7 @@ if [ -d "$WEBINOS_PZH_DATA" ]; then
 fi
 
 #if [ ! -d $WEBINOS_PZH_DIR ]; then
-  npm install git://github.com/habibvirji/webinos-pzh.git
+  npm install git://github.com/webinos/webinos-pzh.git
   echo "Installed the PZH and its dependencies"
 #fi
 
