@@ -16,7 +16,6 @@
  * Copyright 2011 Alexander Futasz, Fraunhofer FOKUS
  ******************************************************************************/
 (function () {
-    if (typeof webinos === "undefined") webinos = {};
     var channel = null;
 
     /**
