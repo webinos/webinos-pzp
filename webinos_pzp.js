@@ -23,6 +23,10 @@ __EnablePolicyEditor = false;
 var argv = require ('optimist')
     .usage ('Starts webinos PZP \nUsage: $0')
     .options ({
+        "pzpHost" :
+        { describe : "External PZP HTTP Server Hostname (autodetect, fallback: 0.0.0.0)"
+        , default : ""
+        },
         "pzhHost"         :{
             describe:"set the ip-address of the pzh provider",
             default :"0.0.0.0"
