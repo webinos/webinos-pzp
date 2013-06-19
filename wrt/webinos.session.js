@@ -17,8 +17,15 @@
  * Copyright 2012 - 2013 Samsung Electronics (UK) Ltd
  * Authors: Habib Virji
  ******************************************************************************/
-if (typeof webinos === "undefined") var webinos = {};
-if (typeof webinos.session === "undefined") webinos.session = {};
+if (typeof exports === "undefined") exports = window;
+if (typeof exports.webinos === "undefined") exports.webinos = {};
+if (typeof exports.webinos.session === "undefined") exports.webinos.session = {};
+
+if (typeof _webinos === "undefined") {
+    _webinos = {};
+    _webinos.registerServiceConstructor = function(){};
+}
+
 (function() {
     "use strict";
 
