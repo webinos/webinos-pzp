@@ -1,11 +1,11 @@
 { "name": "webinos-pzp",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Webinos device functionality is implemented in PZP",
   "main": "./lib/pzp_sessionHandling.js",
   "author": "Habib Virji  <habib.virji@samsung.com>",
   "homepage": "http://www.webinos.org",
   "bugs": "http://jira.webinos.org",
-  "repositories":
+  "repository":
    { "type": "git",
      "url": "git://github.com/webinos/webinos-pzp.git"
    },

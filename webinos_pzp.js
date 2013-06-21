@@ -23,6 +23,10 @@ __EnablePolicyEditor = false;
 var argv = require ('optimist')
     .usage ('Starts webinos PZP \nUsage: $0')
     .options ({
+        "pzpHost" :
+        { describe : "External PZP HTTP Server Hostname (autodetect, fallback: 0.0.0.0)"
+        , default : ""
+        },
         "pzhHost"         :{
             describe:"set the ip-address of the pzh provider",
             default :"0.0.0.0"
@@ -104,15 +108,15 @@ function initializeWidgetServer () {
 
     if (wrt) {
         // Attempt to start the widget server.
-        wrt.start (argv.signedWidgetOnly, argv.enforceWidgetCSP, argv.useWidgetProtocol, PzpSession.getWebinosPorts("pzp_webSocket"), "webinos",
+        wrt.start (argv.signedWidgetOnly, argv.enforceWidgetCSP, argv.useWidgetProtocol, PzpSession.getWebinosPorts().pzp_webSocket, "webinos",
             function (msg, wrtPort) {
                 if (msg === "startedWRT") {
                     // Write the websocket and widget server ports to file so the renderer can pick them up.
                     var wrtConfig = {};
                     wrtConfig.runtimeWebServerPort = wrtPort;
-                    wrtConfig.pzpWebSocketPort = PzpSession.getWebinosPorts("pzp_webSocket");
-                    wrtConfig.pzpPath = PzpSession.getMetaData("webinosRoot");
-                    require ("fs").writeFile ((require ("path").join (PzpSession.getMetaData("webinosRoot"), '/wrt/webinos_runtime.json')),
+                    wrtConfig.pzpWebSocketPort = PzpSession.getWebinosPorts().pzp_webSocket;
+                    wrtConfig.pzpPath = PzpSession.getWebinosPath ();
+                    require ("fs").writeFile ((require ("path").join (PzpSession.getWebinosPath(), '/wrt/webinos_runtime.json')),
                         JSON.stringify (wrtConfig, null, ' '), function (err) {
                             if (err) {
                                 console.log ('error saving runtime configuration file: ' + err);
