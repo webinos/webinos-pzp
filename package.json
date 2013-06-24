@@ -22,6 +22,7 @@
     "webinos-policy"            : "git://github.com/webinos/webinos-policy.git",
     "webinos-synchronization"   : "git://github.com/webinos/webinos-synchronization.git",
     "webinos-api-serviceDiscovery":"git://github.com/webinos/webinos-api-serviceDiscovery.git",
+    "webinos-drivers-manager":"git://github.com/webinos/webinos-drivers-manager.git",
     "webinos-jsonrpc2"   : "*",
     "websocket": "1.0.2",
     "optimist": "x.x.x"
