@@ -594,7 +594,7 @@ describe("check synchronization with the PZH", function(){
         //setTimeout(function(){
         var pzpData = require(pzpPath+"/userData/serviceCache.json");
         var pzhData = require(pzhPath+"/userData/serviceCache.json");
-        console.log(Object.keys(pzpData).length, Object.keys(pzhData).length);
+        //console.log(Object.keys(pzpData).length, Object.keys(pzhData).length);
 
         done();
         //}, 1500);
