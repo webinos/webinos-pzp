@@ -9,6 +9,9 @@ wrt_Dir = path.resolve(__dirname, "./wrt"); // To read webinos.js and webinos.se
 fs.writeFileSync(path.join(webroot_Dir, "webinos.js"),""); // Overwrite/create file
 webinosJS = fs.createWriteStream(path.join(webroot_Dir, "webinos.js"), { flags:"a", encoding:"utf8"});
 
+//Prevent loading webinos.js more than once
+webinosJS.write("if(typeof webinos === 'undefined'){\n");
+
 var mandatoryWebinosJS=[path.join(nodemodule_Dir,"webinos-jsonrpc2","lib","registry.js"),
     path.join(nodemodule_Dir,"webinos-jsonrpc2","lib","rpc.js"),
     path.join(nodemodule_Dir,"webinos-messaging","lib","messagehandler.js"),
@@ -41,4 +44,8 @@ for (i = 0; i < fileList.length; i = i + 1) {
         }
     }
 }
+
+//Prevent loading webinos.js more than once, closing bracket
+webinosJS.write("\n}");
+
 console.log("created webinosJS");
