@@ -62,11 +62,12 @@ function findService(address, callback){
             expect(service.displayName).toEqual('Test');
             expect(service._testAttr).toEqual('HelloWorld');
             // POLICY: Check WRT POLICY
+            console.log("!!!!!!!!!!!!!!!!!!DEBUG",service.serviceAddress, address)
             if(service.serviceAddress === address) {
                 service.bindService({onBind:function (service1) {
-                    expect(service1.id).toEqual(service.id),
-                        expect(service1.api).toEqual(service.api),
-                        expect(service1.displayName).toEqual(service.displayName);
+                    expect(service1.id).toEqual(service.id);
+                    expect(service1.api).toEqual(service.api);
+                    expect(service1.displayName).toEqual(service.displayName);
                     expect(typeof service1.get42).toEqual("function");
                     expect(typeof service1.listenerFor42).toEqual("function");
                 }});
@@ -133,9 +134,10 @@ function createPzp(i, callback ) {
 }
 
 function enrollPzp(pzhConnection, user, pzpInstance) {
+    webinos.webinos.session.message_send({type:'prop', payload:{status:'setPzhProviderAddress', message:pzhAddress}});
     var msg = {user: user,
         message: {type:"csrFromPzp",
-            from:pzpInstance.getDeviceName(),
+            from:pzpInstance.getMetaData("webinosName"),
             csr:pzpInstance.getCertificateToBeSignedByPzh(),
             friendlyName: pzpInstance.getFriendlyName()}};
     pzhConnection.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify(msg)));
@@ -154,10 +156,10 @@ describe("Create a VIRGIN PZP", function(){
     });
     it ("SessionId = Device name in virgin mode", function() {
         expect(pzpInstance.getSessionId()).not.toBeNull();
-        expect(pzpInstance.getDeviceName()).not.toBeNull();
-        expect(pzpInstance.getDeviceName()).toEqual((os.hostname()).substring(0,34)); // Device Name should equal device hostname.
-        expect(pzpInstance.getDeviceName()).toEqual(pzpInstance.getSessionId());// in virgin mode they should be equal
-        expect(pzp_api.getDeviceName()).toEqual(pzpInstance.getDeviceName());// PZP exposed API should equal instance value
+        expect(pzpInstance.getMetaData("webinosName")).not.toBeNull();
+        expect(pzpInstance.getMetaData("webinosName")).toEqual((os.hostname()).substring(0,34)); // Device Name should equal device hostname.
+        expect(pzpInstance.getMetaData("webinosName")).toEqual(pzpInstance.getSessionId());// in virgin mode they should be equal
+        expect(pzp_api.getDeviceName()).toEqual(pzpInstance.getMetaData("webinosName"));// PZP exposed API should equal instance value
         expect(pzp_api.getSessionId()).toEqual(pzpInstance.getSessionId());
     });
 });
@@ -174,18 +176,18 @@ describe("PZP default configuration in VIRGIN mode", function(){
         expect(metaData).not.toBeNull();
         expect(pzpInstance.getPzhId()).not.toBeNull();
         expect(metaData.pzhId).toEqual(pzpInstance.getPzhId());
-        expect(pzpInstance.getServerAddress()).not.toBeNull();
-        expect(metaData.serverName).toEqual(pzpInstance.getServerAddress());
-        expect(pzpInstance.getWebinosVersion()).not.toBeNull();
-        expect(metaData.webinos_version).toEqual(pzpInstance.getWebinosVersion());
-        expect(pzpInstance.getDeviceName()).not.toBeNull();
-        expect(metaData.webinosName).toEqual(pzpInstance.getDeviceName());
-        expect(pzpInstance.getWebinosPath()).not.toBeNull();
-        expect(metaData.webinosRoot).toEqual(pzpInstance.getWebinosPath());
+        expect(pzpInstance.getMetaData("serverName")).not.toBeNull();
+        expect(metaData.serverName).toEqual(pzpInstance.getMetaData("serverName"));
+        expect(pzpInstance.getMetaData("webinos_version")).not.toBeNull();
+        expect(metaData.webinos_version).toEqual(pzpInstance.getMetaData("webinos_version"));
+        expect(pzpInstance.getMetaData("webinosName")).not.toBeNull();
+        expect(metaData.webinosName).toEqual(pzpInstance.getMetaData("webinosName"));
+        expect(pzpInstance.getMetaData("webinosRoot")).not.toBeNull();
+        expect(metaData.webinosRoot).toEqual(pzpInstance.getMetaData("webinosRoot"));
         expect(pzpInstance.getFriendlyName()).not.toBeNull();
         expect(metaData.friendlyName).toEqual(pzpInstance.getFriendlyName());
-        expect(pzpInstance.getRetryConnectionValue()).not.toBeNull();
-        expect(metaData.retryConnection).toEqual(pzpInstance.getRetryConnectionValue());
+        expect(pzpInstance.getMetaData("retryConnection")).not.toBeNull();
+        expect(metaData.retryConnection).toEqual(pzpInstance.getMetaData("retryConnection"));
     });
     it ("Service cache i.e. services are loaded", function() {
         var serviceCache = JSON.parse(fs.readFileSync(path.join(webinosPath,"userData","serviceCache.json")).toString());
@@ -231,27 +233,27 @@ describe("Master and connection certificates/privateKey", function() {
 
     it("Master certificate", function(){
         expect(certificates.master.key_id).not.toBeNull();
-        expect(certificates.master.key_id).toContain(pzpInstance.getDeviceName()+"_master");
-        expect(pzpInstance.getMasterCertificate()).not.toBeNull();
+        expect(certificates.master.key_id).toContain(pzpInstance.getMetaData("webinosName")+"_master");
+        expect(pzpInstance.getCertificate("master")).not.toBeNull();
         expect(pzpInstance.getCertificateToBeSignedByPzh()).not.toBeNull();
         expect(certificates.master.csr).toContain(CERT_REQ_START);
         expect(certificates.master.csr).toContain(CERT_REQ_END);
         expect(certificates.master.csr).toContain(pzpInstance.getCertificateToBeSignedByPzh());
         expect(certificates.master.cert).toContain(CERT_START);
         expect(certificates.master.cert).toContain(CERT_END);
-        expect(certificates.master.cert).toEqual(pzpInstance.getMasterCertificate());
+        expect(certificates.master.cert).toEqual(pzpInstance.getCertificate("master"));
     });
 
     it("Connection certificate", function(){
         expect(certificates.conn.key_id).not.toBeNull();
-        expect(certificates.conn.key_id).toContain(pzpInstance.getDeviceName()+"_conn");
+        expect(certificates.conn.key_id).toContain(pzpInstance.getMetaData("webinosName")+"_conn");
         expect(certificates.conn.csr).not.toBeNull();
         expect(certificates.conn.csr).toContain(CERT_REQ_START);
         expect(certificates.conn.csr).toContain(CERT_REQ_END);
         expect(certificates.conn.cert).toContain(CERT_START);
         expect(certificates.conn.cert).toContain(CERT_END);
-        expect(pzpInstance.getConnectionCertificate()).not.toBeNull();
-        expect(certificates.conn.cert).toEqual(pzpInstance.getConnectionCertificate());
+        expect(pzpInstance.getCertificate("conn")).not.toBeNull();
+        expect(certificates.conn.cert).toEqual(pzpInstance.getCertificate("conn"));
     });
 
     it("CRL", function(){
@@ -268,7 +270,7 @@ describe("PZP WebSocket Server ", function(){
         expect(started).toBeTruthy();
     });
     it ("WSS HTTP server running status", function (done) {
-        require("http").get("http://localhost:"+pzpInstance.getWebinosPorts().pzp_webSocket, function(res){
+        require("http").get("http://localhost:"+pzpInstance.getWebinosPorts("pzp_webSocket"), function(res){
             expect(res.statusCode).toEqual(200);
             done();
         });
@@ -320,7 +322,7 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
     it("PZH farm status", function(done){
         wUtil.webinosHostname.getHostName("", function (address) {
             pzhAddress= address;
-            var socket = require("net").createConnection(pzpInstance.getWebinosPorts().provider,  address); //Check if we are online..
+            var socket = require("net").createConnection(pzpInstance.getWebinosPorts("provider"),  address); //Check if we are online..
             socket.on('connect', function() {
                 socket.end();
                 done();
@@ -330,7 +332,7 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
     it("Enroll A PZP at the PZH", function(done){
         // Makes a TLS connection towards PZH similar to PZH webServer
         if(createPzhProvider()){
-            pzhConnection = require("tls").connect(pzpInstance.getWebinosPorts().provider,pzhAddress, pzhWebCertificates,
+            pzhConnection = require("tls").connect(pzpInstance.getWebinosPorts("provider"),pzhAddress, pzhWebCertificates,
             function () {
                 expect(pzhConnection.authorized).toEqual(true);
                 user = createPzh(pzhConnection, "hello0@"+USER_DOMAIN, "Hello#0");
@@ -342,8 +344,8 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
                     } else if (obj.payload && obj.payload.message && obj.payload.message.payload && obj.payload.message.payload.status === "signedCertByPzh"){
                         expect(obj.user.nickname).toEqual("hello0");
                         expect(obj.payload.type).toEqual("csrFromPzp");
-                        expect(obj.payload.message.from).toEqual("hello0@"+pzhAddress+":"+pzpInstance.getWebinosPorts().provider);
-                        expect(obj.payload.message.to).toEqual("hello0@"+pzhAddress+":"+pzpInstance.getWebinosPorts().provider+"/"+pzpInstance.getDeviceName());
+                        expect(obj.payload.message.from).toEqual("hello0@"+pzhAddress);
+                        expect(obj.payload.message.to).toEqual("hello0@"+pzhAddress+"/"+pzpInstance.getMetaData("webinosName"));
                         expect(obj.payload.message.payload.status).toEqual("signedCertByPzh");
                         expect(obj.payload.message.payload.message.clientCert).not.toBeNull();
                         expect(obj.payload.message.payload.message.clientCert).toContain(CERT_START);
@@ -360,8 +362,6 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
                 });
             });
         }
-
-
     },1000);
     it("Connect to the PZH", function(done) {
         if (typeof pzpInstance.getPzhId() === 'undefined') {
@@ -374,7 +374,7 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
     });
     it("Find service at the PZH", function(done){
         setTimeout(function() {
-            findService("hello0@"+pzhAddress+":"+providerPort,function(status){
+            findService("hello0@"+pzhAddress,function(status){
                 if (status) done();
             })
         }, 50);// the update message that PZP sends take time to reach websocket client...
@@ -396,8 +396,8 @@ describe("Create "+numberOfPZP+" PZP and Enroll with the Same PZH ", function(){
                   pzhConnection.on("data", function (_buffer) {
                       wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                           if (obj&& obj.payload && obj.payload.message && obj.payload.message.payload && obj.payload.message.payload.status === "signedCertByPzh"){
-                              expect(obj.payload.message.from).toEqual("hello0@"+pzhAddress+":"+pzpInstance.getWebinosPorts().provider);
-                              expect(obj.payload.message.to).toEqual("hello0@"+pzhAddress+":"+pzpInstance.getWebinosPorts().provider+"/"+pzpInstance.getDeviceName());
+                              expect(obj.payload.message.from).toEqual("hello0@"+pzhAddress);
+                              expect(obj.payload.message.to).toEqual("hello0@"+pzhAddress+"/"+pzpInstance.getMetaData("webinosName"));
                               expect(obj.payload.message.payload.status).toEqual("signedCertByPzh");
                               expect(obj.payload.message.payload.message.clientCert).toContain(CERT_START);
                               expect(obj.payload.message.payload.message.masterCert).toContain(CERT_START);
@@ -406,13 +406,13 @@ describe("Create "+numberOfPZP+" PZP and Enroll with the Same PZH ", function(){
                               pzpInstance.connectHub();
                               pzpInstance.on("HUB_CONNECTED", function(){
                                   setTimeout(function(){
-                                      var addressLookService = "hello0@" + pzhAddress+":"+providerPort + "/machine_"+ ((i === 0 )?0: (i-1)); // Find Service at other PZP
+                                      var addressLookService = "hello0@" + pzhAddress+ "/machine_"+ ((i === 0 )?0: (i-1)); // Find Service at other PZP
                                       findService(addressLookService,function(){
-                                          pzhConnection.socket.end();
+                                          //pzhConnection.socket.end();
                                           if ((i+1) < numberOfPZP) createPzpEnroll(i + 1);
                                           else done();
                                       });
-                                  },50); // Time Before everything get started....
+                                  },100); // Time Before everything get started....
                               });
                           }
                       });
@@ -425,7 +425,7 @@ describe("Create "+numberOfPZP+" PZP and Enroll with the Same PZH ", function(){
 });
 
 // Create PZH,inside PZH there will be single PZP, 2 PZH will connect each other and find service in PZP of other zone
-describe("Create Multiple PZH and do certificate exchange between them", function() {
+describe("PZH - PZH certificate exchange", function() {
     it("Create Multiple PZH, each PZH will have a PZP created and enrolled with them", function(done) {
         function createPzh_Pzp(i) {
             var socket = require("tls").connect(providerPort,pzhAddress, pzhWebCertificates,
@@ -487,18 +487,18 @@ describe("Create Multiple PZH and do certificate exchange between them", functio
                 function() {
                     var user = {emails: [{value:"hello"+i+"@"+USER_DOMAIN}], displayName: "Hello#"+i,  from: "google", "nickname":"hello"+i, "identifier":"hello"+i+"@"+USER_DOMAIN};
                     // hello0@webinos.org connect to all PZHs
-                    msg = {user: user, message: {type: "approveFriend", "externalUserId":"hello0@"+pzhAddress + ":" + providerPort}};
+                    msg = {user: user, message: {type: "approveFriend", "externalUserId":"hello0@"+pzhAddress}};
                     socket.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify(msg)));
-                    //socket.on("data", function (_buffer) {
-                    //    wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
-                    //        if(obj.payload && obj.payload.type && obj.payload.type === "approveFriend") {
-                    //            expect(obj.payload.message).toEqual(true);
+                    socket.on("data", function (_buffer) {
+                        wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                            if(obj.payload && obj.payload.type && obj.payload.type === "approveFriend") {
+                                expect(obj.payload.message).toEqual(true);
                                 socket.socket.end();
                                 if ((i+1) < numberOfPZH) approvePZH(i+1);
                                 else done();
-                     //       }
-                    //    });
-                    //});
+                           }
+                        });
+                    });
 
                 });
         }
@@ -510,7 +510,7 @@ describe("Create Multiple PZH and do certificate exchange between them", functio
         // So findService from PZHA about PZHB services...
         function findServicePzp(i) {
             setTimeout(function(){
-                var address = "hello"+i+"@"+pzhAddress+":"+providerPort +"/machine_"+ (numberOfPZP+i);
+                var address = "hello"+i+"@"+pzhAddress+"/machine_"+ (numberOfPZP+i);
                 findService(address, function(status){
                     expect(status).toBeTruthy();
                     if ((i + 1) < numberOfPZH) findServicePzp(i+1);
@@ -520,7 +520,7 @@ describe("Create Multiple PZH and do certificate exchange between them", functio
 
         }
         findServicePzp(1);
-    }, numberOfPZH * 1500); // It takes extra time as more hops are involved
+    }, numberOfPZH * 15000); // It takes extra time as more hops are involved
 });
 
 describe("machine with long Pzp Name", function(){
@@ -540,8 +540,8 @@ describe("machine with long Pzp Name", function(){
                pzhConnection.on("data", function (_buffer) {
                    wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
                        if (obj&& obj.payload && obj.payload.message && obj.payload.message.payload && obj.payload.message.payload.status === "signedCertByPzh"){
-                           expect(obj.payload.message.from).toEqual("hello0@"+pzhAddress+":"+pzpInstance.getWebinosPorts().provider);
-                           expect(obj.payload.message.to).toEqual("hello0@"+pzhAddress+":"+pzpInstance.getWebinosPorts().provider+"/"+pzpInstance.getDeviceName());
+                           expect(obj.payload.message.from).toEqual("hello0@"+pzhAddress);
+                           expect(obj.payload.message.to).toEqual("hello0@"+pzhAddress+"/"+pzpInstance.getMetaData("webinosName"));
                            expect(obj.payload.message.payload.status).toEqual("signedCertByPzh");
                            expect(obj.payload.message.payload.message.clientCert).toContain(CERT_START);
                            expect(obj.payload.message.payload.message.masterCert).toContain(CERT_START);
@@ -550,12 +550,12 @@ describe("machine with long Pzp Name", function(){
                            pzpInstance.connectHub();
                            pzpInstance.on("HUB_CONNECTED", function(){
                                setTimeout(function(){
-                                   var addressLookService = "hello0@"+pzhAddress+":"+providerPort; // Find Service at PZH
+                                   var addressLookService = "hello0@"+pzhAddress; // Find Service at PZH
                                    findService(addressLookService,function(){
                                      pzhConnection.socket.end();
                                      done();
                                    });
-                               },50); // Time Before everything get started....
+                               },1000); // Time Before everything get started....
                            });
                        }
                    });
@@ -563,4 +563,40 @@ describe("machine with long Pzp Name", function(){
            });
        });
    });
+});
+
+// Check sync with PZH
+
+describe("check synchronization with the PZH", function(){
+    it("check at the pzp if contents match with the contents of the PZH", function(done){
+        var pzhPath = pzpInstance.getMetaData("webinosRoot")+"Pzh/hello0";
+        var pzpPath = pzpInstance.getMetaData("webinosRoot");
+       pzpInstance.getFileList().forEach(function(name){
+           if (name.fileName === "trustedList") {
+               expect(require(pzpPath+"/trustedList.json")).toEqual(require(pzhPath+"/trustedList.json"));
+           }
+           if (name.fileName === "crl") {
+               expect(require(pzpPath+"/crl.json")).toEqual(require(pzhPath+"/crl.json"));
+           }
+           if (name.fileName === "certificates") {
+               expect(require(pzpPath+"/certificates/external/certificates.json")).toEqual(require(pzhPath+"/certificates/external/certificates.json"));
+           }
+           if (name.fileName === "serviceCache") {
+               expect(require(pzpPath+"/userData/serviceCache.json")).not.toEqual(require(pzhPath+"/userData/serviceCache.json")); // PZH service
+           }
+       });
+       done();
+    });
+    it("PZP service cache synced with the PZH", function(done){
+        var pzhPath = pzpInstance.getMetaData("webinosRoot")+"Pzh/hello0";
+        var pzpPath = pzpInstance.getMetaData("webinosRoot");
+        //pzpInstance.synchronizationStart();
+        //setTimeout(function(){
+        var pzpData = require(pzpPath+"/userData/serviceCache.json");
+        var pzhData = require(pzhPath+"/userData/serviceCache.json");
+        //console.log(Object.keys(pzpData).length, Object.keys(pzhData).length);
+
+        done();
+        //}, 1500);
+    },2000);
 });
