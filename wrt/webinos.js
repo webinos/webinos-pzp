@@ -43,6 +43,10 @@
             // Find web server hostname.
             hostname = window.location.hostname;
             if (hostname == "") isWebServer = false; // We are inside a local file.
+            if(hostname !== "localhost" || hostname !=="127.0.0.1") {
+              console.log("websocket connection is only possible with address localhost or 127.0.0.1. Please change to localhost or 127.0.0.1 " +
+                  "to connect to the PZP");
+            }
 
             // Find out the communication socket info.
 
@@ -101,6 +105,9 @@
         channel.onopen = function() {
           var url = window.location.pathname;
           webinos.session.message_send({type: 'prop', payload: {status:'registerBrowser', value: url}});
+        };
+        channel.onerror = function(evt) {
+          console.log("WebSocket error" + JSON.stringify(evt));
         };
     }
 
