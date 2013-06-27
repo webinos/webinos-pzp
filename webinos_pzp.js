@@ -114,9 +114,9 @@ function initializeWidgetServer () {
                     // Write the websocket and widget server ports to file so the renderer can pick them up.
                     var wrtConfig = {};
                     wrtConfig.runtimeWebServerPort = wrtPort;
-                    wrtConfig.pzpWebSocketPort = PzpSession.getWebinosPorts ().pzp_webSocket;
+                    wrtConfig.pzpWebSocketPort = PzpSession.getWebinosPorts().pzp_webSocket;
                     wrtConfig.pzpPath = PzpSession.getWebinosPath ();
-                    require ("fs").writeFile ((require ("path").join (PzpSession.getWebinosPath (), '/wrt/webinos_runtime.json')),
+                    require ("fs").writeFile ((require ("path").join (PzpSession.getWebinosPath(), '/wrt/webinos_runtime.json')),
                         JSON.stringify (wrtConfig, null, ' '), function (err) {
                             if (err) {
                                 console.log ('error saving runtime configuration file: ' + err);
