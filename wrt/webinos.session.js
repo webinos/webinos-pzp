@@ -30,7 +30,7 @@ if (typeof _webinos === "undefined") {
     "use strict";
 
     var sessionId = null, pzpId, pzhId, connectedDevices =[], isConnected = false, enrolled = false, mode, port = 8080,
-        serviceLocation, webinosVersion,listenerMap = {}, channel;
+        serviceLocation, webinosVersion,listenerMap = {}, channel, pzhWebAddress = "https://pzh.webinos.org/";
     function callListenerForMsg(data) {
         var listeners = listenerMap[data.payload.status] || [];
         for(var i = 0;i < listeners.length;i++) {
@@ -48,6 +48,9 @@ if (typeof _webinos === "undefined") {
         isConnected = !!(webinos.session.getConnectedPzh().indexOf(pzhId) !== -1);
         enrolled = message.enrolled;
         mode = message.mode;
+        if (message.hasOwnProperty("pzhWebAddress")) {
+            webinos.session.setPzhWebAddress(message.pzhWebAddress);
+        } 
     }
     function setWebinosSession(data){
         sessionId = data.to;
@@ -68,6 +71,12 @@ if (typeof _webinos === "undefined") {
     };
     webinos.session.getPzpPort = function () {
         return port;
+    };
+    webinos.session.setPzhWebAddress = function (pzhWebAddress_) {
+        pzhWebAddress = pzhWebAddress_;
+    };
+    webinos.session.getPzhWebAddress = function () {
+        return pzhWebAddress;
     };
     webinos.session.message_send_messaging = function(msg, to) {
         msg.resp_to = webinos.session.getSessionId();
@@ -180,62 +189,28 @@ if (typeof _webinos === "undefined") {
     webinos.session.handleMsg = function(data) {
         if(typeof data === "object" && data.type === "prop") {
             switch(data.payload.status) {
+                case "webinosVersion":
+                case "update":
                 case "registeredBrowser":
                     setWebinosSession(data);
-                    callListenerForMsg(data);
-                    break;
                 case "pzpFindPeers":
-                    callListenerForMsg(data);
-                    break;
                 case "pubCert":
-                    callListenerForMsg(data);
-                    break;
                 case "showHashQR":
-                    callListenerForMsg(data);
-                    break;
                 case "addPzpQR":
-                    callListenerForMsg(data);
-                    break;
                 case "requestRemoteScanner":
-                    callListenerForMsg(data);
-                    break;
                 case "checkHashQR":
-                    callListenerForMsg(data);
-                    break;
                 case "sendCert":
-                    callListenerForMsg(data);
-                    break;
                 case "connectPeers":
-                    callListenerForMsg(data);
-                    break;
                 case "intraPeer":
-                    callListenerForMsg(data);
-                    break;
-                case "update":
-                    setWebinosSession(data);
-                    callListenerForMsg(data);
-                    break;
                 case "infoLog":
-                    callListenerForMsg(data);
-                    break;
                 case "errorLog":
-                    callListenerForMsg(data);
-                    break;
                 case "error":
-                    callListenerForMsg(data);
-                    break;
                 case "friendlyName":
-                    callListenerForMsg(data);
-                    break;
-                case "webinosVersion":
-                    setWebinosVersion(data);
+                case "gatherTestPageLinks":
                     callListenerForMsg(data);
                     break;
                 case "pzhDisconnected":
                     isConnected = false;
-                    callListenerForMsg(data);
-                    break;
-                case "gatherTestPageLinks":
                     callListenerForMsg(data);
                     break;
             }
