@@ -382,6 +382,7 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
     // POLICY: Check at PZP by searching for service that is not allowed
 });
 ////// End of Single PZP test cases ....\\\\\\\\\\\\
+/*
 // Enroll multiple PZPs at a PZH
 describe("Create "+numberOfPZP+" PZP and Enroll with the Same PZH ", function(){
    it("Create "+numberOfPZP+" PZPs", function(done){
@@ -597,3 +598,4 @@ describe("check synchronization with the PZH", function(){
         //}, 1500);
     },2000);
 });
+                                */
