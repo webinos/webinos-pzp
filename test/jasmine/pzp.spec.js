@@ -564,6 +564,8 @@ describe("machine with long Pzp Name", function(){
        });
    });
 });
+ /*
+>>>>>>> Service cache is read from the sync list
 // Check sync with PZH
 
 describe("check synchronization with the PZH", function(){
@@ -596,3 +598,6 @@ describe("check synchronization with the PZH", function(){
         //}, 1500);
     },2000);
 });
+<<<<<<< HEAD
+=======
+   */
