@@ -15,12 +15,11 @@
         "commit_id": "gd62f210"
     },
     "android": {
-        "webinos": "/data/data/org.webinos.android/webinos",
         "wrt": "/data/data/org.webinos.android/wrt",
         "web_root": "/data/data/org.webinos.android/node_modules/webinos/wp4/webinos/web_root",
         "QRImpl": "org.webinos.impl.QRImpl",
         "PZPNotificationManagerImpl": "org.webinos.impl.PZPNotificationManagerImpl",
         "WebinosSocketServerImpl": "org.webinos.android.app.wrt.channel.WebinosSocketServerImpl",
-        "WidgetManagerImpl":       "org.webinos.android.app.wrt.mgr.WidgetManagerImpl"
+        "WidgetManagerImpl": "org.webinos.android.app.wrt.mgr.WidgetManagerImpl"
     }
 }
