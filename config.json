@@ -13,5 +13,13 @@
         "tag": "v0.8.0",
         "num_commit": "134",
         "commit_id": "gd62f210"
+    },
+    "android": {
+        "wrt": "/data/data/org.webinos.android/wrt",
+        "web_root": "/data/data/org.webinos.android/node_modules/webinos/wp4/webinos/web_root",
+        "QRImpl": "org.webinos.impl.QRImpl",
+        "PZPNotificationManagerImpl": "org.webinos.impl.PZPNotificationManagerImpl",
+        "WebinosSocketServerImpl": "org.webinos.android.app.wrt.channel.WebinosSocketServerImpl",
+        "WidgetManagerImpl": "org.webinos.android.app.wrt.mgr.WidgetManagerImpl"
     }
 }
