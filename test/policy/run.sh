@@ -73,7 +73,7 @@ echo "Killing the PZP"
 # Kill the PZP
 kill -9 $PZP_PID
 
-if [ $TEST_RESULT ]; then
+if [ $TEST_RESULT -eq 0 ]; then
   echo "TEST PASSED"
 else 
   echo "TEST FAILED"
