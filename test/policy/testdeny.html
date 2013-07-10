@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>Testing policies: all policies deny</title>
+    <script type="text/javascript" src="webinos.js"></script>
+    <script type="text/javascript">
+
+    var helloService = null;
+
+    function doSuccess() {
+      document.getElementById("testResult").textContent = "Success!";
+    }
+
+    function doFailure(err) {
+      document.getElementById("testResult").textContent = "Failed: " + JSON.stringify(err);
+    }
+
+    function invokeGet42(service) {
+      try {
+        service.get42(null, doSuccess, doFailure);
+      } catch (err) {
+        doFailure(err);
+      }
+    }
+
+    function serviceBound(service) {
+      helloService = service;
+      console.log("Bound!");
+      invokeGet42(service);
+    }
+    function serviceFound(service) {
+		  console.log("We've found a service! Name: " + service.displayName );
+      service.bindService({ onBind: serviceBound });
+		}
+		function findTestService() {
+		  webinos.discovery.findServices(
+		    new ServiceType('http://webinos.org/api/test'),
+		    { onFound: serviceFound }
+		  );
+		}
+		window.onload = findTestService;
+    </script>
+  </head>
+  <body>
+  	<p id="testResult"> Test in progress.</p>
+  </body>
+</html>

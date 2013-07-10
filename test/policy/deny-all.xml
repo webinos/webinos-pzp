@@ -1,0 +1,20 @@
+<policy id="p1" combine="first-applicable" description="catch">
+	<rule effect="permit">
+			<condition combine="or">
+				<resource-match attr="api-feature" match="http://webinos.org/api/discovery"/>
+			</condition>
+	</rule>	
+	<DataHandlingPreferences PolicyId="#DHP_allow_all">
+		<AuthorizationsSet>
+			<AuthzUseForPurpose>
+					<Purpose/>
+			</AuthzUseForPurpose>
+		</AuthorizationsSet>
+	</DataHandlingPreferences>
+	<ProvisionalActions>
+		<ProvisionalAction>
+			<AttributeValue>#DHP_allow_all</AttributeValue>
+			<AttributeValue>*</AttributeValue>
+		</ProvisionalAction>
+	</ProvisionalActions>
+</policy>
