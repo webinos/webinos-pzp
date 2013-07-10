@@ -1,33 +1,37 @@
-{ "name": "webinos-pzp",
+{
+  "name": "webinos-pzp",
   "version": "0.8.2",
   "description": "Webinos device functionality is implemented in PZP",
   "main": "./lib/pzp_sessionHandling.js",
   "author": "Habib Virji  <habib.virji@samsung.com>",
   "homepage": "http://www.webinos.org",
   "bugs": "http://jira.webinos.org",
-  "repository":
-   { "type": "git",
-     "url": "git://github.com/webinos/webinos-pzp.git"
-   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/webinos/webinos-pzp.git"
+  },
   "directories": {
     "lib": "./lib",
     "node_modules": "./node_modules",
-    "test":"./test"
+    "test": "./test"
   },
-  "bundleDependencies":["webinos-api-test"],
-  "dependencies":{
+  "bundleDependencies": [
+    "webinos-api-test"
+  ],
+  "dependencies": {
     "webinos-certificateHandler": "git://github.com/webinos/webinos-certificateHandler.git",
-    "webinos-utilities"         : "git://github.com/webinos/webinos-utilities.git",
-    "webinos-messaging"         : "git://github.com/webinos/webinos-messaging.git",
-    "webinos-policy"            : "git://github.com/webinos/webinos-policy.git",
-    "webinos-synchronization"   : "git://github.com/webinos/webinos-synchronization.git",
-    "webinos-api-serviceDiscovery":"git://github.com/webinos/webinos-api-serviceDiscovery.git",
-    "webinos-jsonrpc2"   : "*",
+    "webinos-utilities": "git://github.com/webinos/webinos-utilities.git",
+    "webinos-messaging": "git://github.com/webinos/webinos-messaging.git",
+    "webinos-policy": "git://github.com/webinos/webinos-policy.git",
+    "webinos-synchronization": "git://github.com/webinos/webinos-synchronization.git",
+    "webinos-api-serviceDiscovery": "git://github.com/webinos/webinos-api-serviceDiscovery.git",
+    "webinos-jsonrpc2": "*",
     "websocket": "1.0.2",
     "optimist": "x.x.x"
   },
   "devDependencies": {
-    "jasmine-node": "1.x.x"
+    "jasmine-node": "1.x.x",
+    "zombie": "~2.0.0-alpha19"
   },
   "engines": {
     "node": ">= 0.6.0",

@@ -1,0 +1,16 @@
+<policy id="p1" combine="first-applicable" description="catch">
+	<rule id="r1" effect="permit"></rule>
+	<DataHandlingPreferences PolicyId="#DHP_allow_all">
+		<AuthorizationsSet>
+			<AuthzUseForPurpose>
+					<Purpose/>
+			</AuthzUseForPurpose>
+		</AuthorizationsSet>
+	</DataHandlingPreferences>
+	<ProvisionalActions>
+		<ProvisionalAction>
+			<AttributeValue>#DHP_allow_all</AttributeValue>
+			<AttributeValue>*</AttributeValue>
+		</ProvisionalAction>
+	</ProvisionalActions>
+</policy>
