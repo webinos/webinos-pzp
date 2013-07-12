@@ -302,8 +302,8 @@ describe("Browser/Widget connection to WebSocket server", function () {
             expect(parseData.payload.message.connectedDevices.length).toEqual(1);
             expect(parseData.payload.message.connectedDevices[0].id).toEqual(pzpInstance.getSessionId());
             expect(parseData.payload.message.connectedDevices[0].friendlyName).toEqual(pzpInstance.getFriendlyName());
-            expect(parseData.payload.message.state.hub).toEqual("not_connected");
-            expect(parseData.payload.message.state.peer).toEqual("not_connected");
+            expect(parseData.payload.message.state.Pzp).toEqual("not_connected");
+            expect(parseData.payload.message.state.Pzh).toEqual("not_connected");
             expect(parseData.payload.message.enrolled).toEqual(false);
             done();
         }
@@ -362,7 +362,7 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
                 });
             });
         }
-        pzpInstance.on("HUB_CONNECTED", function(){
+        pzpInstance.on("PZH_CONNECTED", function(){
             done();
         });
     },1000);
@@ -397,7 +397,7 @@ describe("Create "+numberOfPZP+" PZP and Enroll with the Same PZH ", function(){
                               expect(obj.payload.message.payload.message.masterCert).toContain(CERT_START);
                               expect(obj.payload.message.payload.message.masterCrl).toContain(CRL_START);
                               pzpInstance.pzpEnrollment(obj.payload.message.from, obj.payload.message.to, obj.payload.message.payload.message);
-                              pzpInstance.on("HUB_CONNECTED", function(){
+                              pzpInstance.on("PZH_CONNECTED", function(){
                                   setTimeout(function(){
                                       var addressLookService = "hello0@" + pzhAddress+ "/machine_"+ ((i === 0 )?0: (i-1)); // Find Service at other PZP
                                       findService(addressLookService,function(){
@@ -435,7 +435,7 @@ describe("PZH - PZH certificate exchange", function() {
                                 obj.payload.message.payload.status === "signedCertByPzh"){
                                 pzpInstance.pzpEnrollment(obj.payload.message.from, obj.payload.message.to,
                                     obj.payload.message.payload.message);
-                                pzpInstance.on("HUB_CONNECTED", function(){
+                                pzpInstance.on("PZH_CONNECTED", function(){
                                     socket.socket.end();
                                     if ((i +1) < numberOfPZH) createPzh_Pzp(i+1);
                                     else done();
@@ -539,7 +539,7 @@ describe("machine with long Pzp Name", function(){
                            expect(obj.payload.message.payload.message.masterCert).toContain(CERT_START);
                            expect(obj.payload.message.payload.message.masterCrl).toContain(CRL_START);
                            pzpInstance.pzpEnrollment(obj.payload.message.from, obj.payload.message.to, obj.payload.message.payload.message);
-                           pzpInstance.on("HUB_CONNECTED", function(){
+                           pzpInstance.on("PZH_CONNECTED", function(){
                                setTimeout(function(){
                                    var addressLookService = "hello0@"+pzhAddress; // Find Service at PZH
                                    findService(addressLookService,function(){
@@ -556,16 +556,17 @@ describe("machine with long Pzp Name", function(){
    });
 });
  /*
->>>>>>> Service cache is read from the sync list
 // Check sync with PZH
-
 describe("check synchronization with the PZH", function(){
     it("check at the pzp if contents match with the contents of the PZH", function(done){
         var pzhPath = pzpInstance.getMetaData("webinosRoot")+"Pzh/hello0";
         var pzpPath = pzpInstance.getMetaData("webinosRoot");
        pzpInstance.getFileList().forEach(function(name){
            if (name.fileName === "trustedList") {
-               expect(require(pzpPath+"/trustedList.json")).not.toEqual(require(pzhPath+"/trustedList.json"));
+               var pzpTrustedList = require(pzpPath+"/trustedList.json");
+               var pzhTrustedList = require(pzhPath+"/trustedList.json");
+               expect(Object.keys(pzpTrustedList.pzh).length).toEqual(Object.keys(pzhTrustedList.pzh).length);
+               expect(Object.keys(pzpTrustedList.pzp).length).toEqual(Object.keys(pzhTrustedList.pzp).length);
            }
            if (name.fileName === "crl") {
                expect(require(pzpPath+"/crl.json")).toEqual(require(pzhPath+"/crl.json"));
@@ -579,16 +580,10 @@ describe("check synchronization with the PZH", function(){
     it("PZP service cache synced with the PZH", function(done){
         var pzhPath = pzpInstance.getMetaData("webinosRoot")+"Pzh/hello0";
         var pzpPath = pzpInstance.getMetaData("webinosRoot");
-        //pzpInstance.synchronizationStart();
-        //setTimeout(function(){
         var pzpData = require(pzpPath+"/userData/serviceCache.json");
         var pzhData = require(pzhPath+"/userData/serviceCache.json");
-        //console.log(Object.keys(pzpData).length, Object.keys(pzhData).length);
-
+        expect(Object.keys(pzpData).length).toEqual(Object.keys(pzhData).length);
         done();
-        //}, 1500);
     },2000);
 });
-<<<<<<< HEAD
-=======
    */
