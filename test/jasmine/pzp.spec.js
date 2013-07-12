@@ -329,7 +329,7 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
             });
         });
     });
-    it("Enroll A PZP at the PZH", function(done){
+    it("Enroll A PZP at the PZH and Connect", function(done){
         // Makes a TLS connection towards PZH similar to PZH webServer
         if(createPzhProvider()){
             pzhConnection = require("tls").connect(pzpInstance.getWebinosPorts("provider"),pzhAddress, pzhWebCertificates,
@@ -357,21 +357,15 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
                         expect(obj.payload.message.payload.message.masterCrl).toContain(CRL_START);
                         expect(obj.payload.message.payload.message.masterCrl).toContain(CRL_END);
                         pzpInstance.pzpEnrollment(obj.payload.message.from, obj.payload.message.to, obj.payload.message.payload.message); // This message enrolls PZP at the PZH
-                        done();
+
                     }
                 });
             });
         }
-    },1000);
-    it("Connect to the PZH", function(done) {
-        if (typeof pzpInstance.getPzhId() === 'undefined') {
-            console.log("Undefined PZH.  PZP: " + require('util').inspect(pzpInstance));
-        }
-        pzpInstance.connectHub();
         pzpInstance.on("HUB_CONNECTED", function(){
             done();
         });
-    });
+    },1000);
     it("Find service at the PZH", function(done){
         setTimeout(function() {
             findService("hello0@"+pzhAddress,function(status){
@@ -403,7 +397,6 @@ describe("Create "+numberOfPZP+" PZP and Enroll with the Same PZH ", function(){
                               expect(obj.payload.message.payload.message.masterCert).toContain(CERT_START);
                               expect(obj.payload.message.payload.message.masterCrl).toContain(CRL_START);
                               pzpInstance.pzpEnrollment(obj.payload.message.from, obj.payload.message.to, obj.payload.message.payload.message);
-                              pzpInstance.connectHub();
                               pzpInstance.on("HUB_CONNECTED", function(){
                                   setTimeout(function(){
                                       var addressLookService = "hello0@" + pzhAddress+ "/machine_"+ ((i === 0 )?0: (i-1)); // Find Service at other PZP
@@ -442,7 +435,6 @@ describe("PZH - PZH certificate exchange", function() {
                                 obj.payload.message.payload.status === "signedCertByPzh"){
                                 pzpInstance.pzpEnrollment(obj.payload.message.from, obj.payload.message.to,
                                     obj.payload.message.payload.message);
-                                pzpInstance.connectHub();
                                 pzpInstance.on("HUB_CONNECTED", function(){
                                     socket.socket.end();
                                     if ((i +1) < numberOfPZH) createPzh_Pzp(i+1);
@@ -547,7 +539,6 @@ describe("machine with long Pzp Name", function(){
                            expect(obj.payload.message.payload.message.masterCert).toContain(CERT_START);
                            expect(obj.payload.message.payload.message.masterCrl).toContain(CRL_START);
                            pzpInstance.pzpEnrollment(obj.payload.message.from, obj.payload.message.to, obj.payload.message.payload.message);
-                           pzpInstance.connectHub();
                            pzpInstance.on("HUB_CONNECTED", function(){
                                setTimeout(function(){
                                    var addressLookService = "hello0@"+pzhAddress; // Find Service at PZH
