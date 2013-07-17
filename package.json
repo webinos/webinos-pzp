@@ -40,7 +40,6 @@
     "webinos_pzp": "webinos_pzp.js"
   },
   "scripts": {
-    "install": "node build_webinosJS.js",
     "travis-test": "./test/travis-test.sh"
   }
 }
