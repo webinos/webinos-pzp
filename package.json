@@ -18,15 +18,12 @@
   "dependencies":{
     "webinos-certificateHandler": "git://github.com/webinos/webinos-certificateHandler.git",
     "webinos-utilities"         : "git://github.com/webinos/webinos-utilities.git",
-    "webinos-messaging"         : "git://github.com/webinos/webinos-messaging.git",
     "webinos-policy"            : "git://github.com/webinos/webinos-policy.git",
-    "webinos-synchronization"   : "git://github.com/webinos/webinos-synchronization.git",
-    "webinos-api-serviceDiscovery":"git://github.com/webinos/webinos-api-serviceDiscovery.git",
-    "webinos-dashboard": "git://github.com/webinos/webinos-dashboard.git",
-    "webinos-api-applauncher": "git://github.com/webinos/webinos-api-applauncher.git",
-    "webinos-jsonrpc2"   : "*",
-    "websocket": "1.0.2",
-    "optimist": "x.x.x"
+    "webinos-dashboard"         : "git://github.com/webinos/webinos-dashboard.git",
+    "webinos-api-applauncher"   : "git://github.com/webinos/webinos-api-applauncher.git",
+    "webinos-jsonrpc2"          : "*",
+    "websocket"                 : "1.0.2",
+    "optimist"                  : "x.x.x"
   },
   "devDependencies": {
     "jasmine-node": "1.x.x"

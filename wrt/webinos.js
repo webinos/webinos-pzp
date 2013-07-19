@@ -43,7 +43,7 @@
             // Find web server hostname.
             hostname = window.location.hostname;
             if (hostname == "") isWebServer = false; // We are inside a local file.
-            if(hostname !== "localhost" || hostname !=="127.0.0.1") {
+            if(hostname !== "localhost" && hostname !=="127.0.0.1") {
               console.log("websocket connection is only possible with address localhost or 127.0.0.1. Please change to localhost or 127.0.0.1 " +
                   "to connect to the PZP");
             }
