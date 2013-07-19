@@ -1157,7 +1157,6 @@ if (typeof webinos.session === "undefined") webinos.session = {};
         isConnected = !!(webinos.session.getConnectedPzh().indexOf(pzhId) !== -1);
         enrolled = message.enrolled;
         mode = message.mode;
-        console.log("************************", sessionId, pzpId, pzhId, connectedDevices, isConnected, enrolled, mode);
     }
     function setWebinosSession(data){
         sessionId = data.to;
@@ -1203,9 +1202,7 @@ if (typeof webinos.session === "undefined") webinos.session = {};
             console.log(rpc);
             channel.send(JSON.stringify(rpc));
         }else {
-            console.log("creating callback");
-            console.log("WebSocket Client: Message Sent");
-            console.log(message);
+            console.log("WebSocket Client: Message Sent : "+ JSON.stringify(message) );
             channel.send(JSON.stringify(message));
         }
     };
@@ -1761,7 +1758,7 @@ console.log(typeMap);
         channel.on("connect",function(connection) {
             webinos.session.setChannel (connection);
             connection.on("message",function (ev) {
-                console.log ('*****************WebSocket Client: Message Received : ' + ev.utf8Data);
+                console.log ('WebSocket Client: Message Received : ' + ev.utf8Data);
                 var data = JSON.parse (ev.utf8Data);
                 if (data.type === "prop") {
                     webinos.session.handleMsg (data);
