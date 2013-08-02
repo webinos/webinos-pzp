@@ -17,15 +17,52 @@
  * Copyright 2012 - 2013 Samsung Electronics (UK) Ltd
  * Authors: Habib Virji
  ******************************************************************************/
-if (typeof webinos === "undefined") var webinos = {};
-if (typeof webinos.session === "undefined") webinos.session = {};
+if (typeof exports === "undefined") exports = window;
+if (typeof exports.webinos === "undefined") exports.webinos = {};
+if (typeof exports.webinos.session === "undefined") exports.webinos.session = {};
+
+if (typeof _webinos === "undefined") {
+    _webinos = {};
+    _webinos.registerServiceConstructor = function(){};
+}
+
 (function() {
     "use strict";
 
-    var sessionId = null, pzpId, pzhId, connectedDevices =[], isConnected = false, enrolled = false, mode, port = 8080;
-    var serviceLocation;
-    var listenerMap = {};
-    var channel;
+    var sessionId = null, pzpId, pzhId, connectedDevices =[], isConnected = false, enrolled = false, mode, port = 8080,
+        serviceLocation, webinosVersion,listenerMap = {}, channel, pzhWebAddress = "https://pzh.webinos.org/";
+    function callListenerForMsg(data) {
+        var listeners = listenerMap[data.payload.status] || [];
+        for(var i = 0;i < listeners.length;i++) {
+            listeners[i](data) ;
+        }
+    }
+    function setWebinosMessaging() {
+        webinos.messageHandler.setOwnSessionId(sessionId);
+        var msg = webinos.messageHandler.createRegisterMessage(pzpId, sessionId);
+        webinos.messageHandler.onMessageReceived(msg, msg.to);
+    }
+    function updateConnected(message){
+        pzhId = message.pzhId;
+        connectedDevices = message.connectedDevices;
+        isConnected = !!(webinos.session.getConnectedPzh().indexOf(pzhId) !== -1);
+        enrolled = message.enrolled;
+        mode = message.mode;
+        if (message.hasOwnProperty("pzhWebAddress")) {
+            webinos.session.setPzhWebAddress(message.pzhWebAddress);
+        } 
+    }
+    function setWebinosSession(data){
+        sessionId = data.to;
+        pzpId     = data.from;
+        if(data.payload.message) {
+            updateConnected(data.payload.message);
+        }
+        setWebinosMessaging();
+    }
+    function setWebinosVersion(data) {
+        webinosVersion = data.payload.message;
+    }
     webinos.session.setChannel = function(_channel) {
         channel = _channel;
     };
@@ -34,6 +71,12 @@ if (typeof webinos.session === "undefined") webinos.session = {};
     };
     webinos.session.getPzpPort = function () {
         return port;
+    };
+    webinos.session.setPzhWebAddress = function (pzhWebAddress_) {
+        pzhWebAddress = pzhWebAddress_;
+    };
+    webinos.session.getPzhWebAddress = function () {
+        return pzhWebAddress;
     };
     webinos.session.message_send_messaging = function(msg, to) {
         msg.resp_to = webinos.session.getSessionId();
@@ -102,12 +145,24 @@ if (typeof webinos.session === "undefined") webinos.session = {};
             if(!pzhId) {
               list.push(connectedDevices[i]);
             } else {
-              for (var j = 0; j < connectedDevices[i].pzp.length; j = j + 1){
-               list.push(connectedDevices[i].pzp[j]);
+              for (var j = 0; j < (connectedDevices[i].pzp && connectedDevices[i].pzp.length); j = j + 1){
+               list.push(connectedDevices[i].pzp[j].id);
               }
            }
         }
         return list;
+    };
+    webinos.session.getFriendlyName = function(id){
+        for (var i = 0 ; i < connectedDevices.length; i = i + 1){
+            if(connectedDevices[i] === id || connectedDevices[i].id === id) {
+                return connectedDevices[i].friendlyName;
+            }
+            for (var j = 0 ; j < (connectedDevices[i].pzp && connectedDevices[i].pzp.length); j = j + 1){
+                if(connectedDevices[i].pzp[j].id === id) {
+                    return connectedDevices[i].pzp[j].friendlyName;
+                }
+            }
+        }
     };
     webinos.session.addListener = function (statusType, listener) {
         var listeners = listenerMap[statusType] || [];
@@ -126,97 +181,36 @@ if (typeof webinos.session === "undefined") webinos.session = {};
         return isConnected;
     };
     webinos.session.getPzpModeState = function (mode_name) {
-        if (enrolled && mode[mode_name] === "connected") {
-            return true;
-        } else {
-            return false;
-        }
+        return  (enrolled && mode[mode_name] === "connected");
     };
-
-    function callListenerForMsg(data) {
-        var listeners = listenerMap[data.payload.status] || [];
-        for(var i = 0;i < listeners.length;i++) {
-            listeners[i](data) ;
-        }
-    }
-    function setWebinosMessaging() {
-        webinos.messageHandler.setOwnSessionId(sessionId);
-        var msg = webinos.messageHandler.createRegisterMessage(sessionId, pzpId);
-        webinos.session.message_send(msg, pzpId);
-    }
-    function updateConnected(message){
-        pzhId = message.pzhId;
-        connectedDevices = message.connectedDevices;
-        isConnected = !!(webinos.session.getConnectedPzh().indexOf(pzhId) !== -1);
-        enrolled = message.enrolled;
-        mode = message.mode;
-    }
-    function setWebinosSession(data){
-        sessionId = data.to;
-        pzpId = data.from;
-        if(data.payload.message) {
-            updateConnected(data.payload.message);
-        }
-        setWebinosMessaging();
-    }
+    webinos.session.getWebinosVersion = function() {
+        return webinosVersion;
+    };
     webinos.session.handleMsg = function(data) {
         if(typeof data === "object" && data.type === "prop") {
             switch(data.payload.status) {
+                case "webinosVersion":
+                case "update":
                 case "registeredBrowser":
                     setWebinosSession(data);
-                    callListenerForMsg(data);
-                    break;
                 case "pzpFindPeers":
-                    callListenerForMsg(data);
-                    break;
                 case "pubCert":
-                    callListenerForMsg(data);
-                    break;
                 case "showHashQR":
-                    callListenerForMsg(data);
-                    break;
                 case "addPzpQR":
-                    callListenerForMsg(data);
-                    break;
                 case "requestRemoteScanner":
-                    callListenerForMsg(data);
-                    break;
                 case "checkHashQR":
-                    callListenerForMsg(data);
-                    break;
                 case "sendCert":
-                    callListenerForMsg(data);
-                    break;
                 case "connectPeers":
-                    callListenerForMsg(data);
-                    break;
                 case "intraPeer":
-                    callListenerForMsg(data);
-                    break;
-                case "update":
-                    setWebinosSession(data);
-                    callListenerForMsg(data);
-                    break;
                 case "infoLog":
-                    callListenerForMsg(data);
-                    break;
                 case "errorLog":
-                    callListenerForMsg(data);
-                    break;
                 case "error":
-                    callListenerForMsg(data);
-                    break;
                 case "friendlyName":
-                    callListenerForMsg(data);
-                    break;
-                case "webinosVersion":
+                case "gatherTestPageLinks":
                     callListenerForMsg(data);
                     break;
                 case "pzhDisconnected":
                     isConnected = false;
-                    callListenerForMsg(data);
-                    break;
-                case "gatherTestPageLinks":
                     callListenerForMsg(data);
                     break;
             }
