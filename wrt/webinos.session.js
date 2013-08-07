@@ -43,11 +43,11 @@ if (typeof _webinos === "undefined") {
         webinos.messageHandler.onMessageReceived(msg, msg.to);
     }
     function updateConnected(message){
-        pzhId = message.pzhId;
-        connectedDevices = message.connectedDevices;
+        if (message.pzhId) pzhId = message.pzhId;
+        if (message.connectedDevices) connectedDevices = message.connectedDevices;
         isConnected = !!(webinos.session.getConnectedPzh().indexOf(pzhId) !== -1);
-        enrolled = message.enrolled;
-        mode = message.mode;
+        if (message.enrolled) enrolled = message.enrolled;
+        if (message.mode) mode = message.mode;
         if (message.hasOwnProperty("pzhWebAddress")) {
             webinos.session.setPzhWebAddress(message.pzhWebAddress);
         } 
@@ -141,7 +141,8 @@ if (typeof _webinos === "undefined") {
     };
     webinos.session.getConnectedPzp = function () {
         var list =[];
-        for (var i = 0 ; i < connectedDevices.length; i = i + 1){
+        if (connectedDevices){
+           for (var i = 0 ; i < connectedDevices.length; i = i + 1){
             if(!pzhId) {
               list.push(connectedDevices[i]);
             } else {
@@ -149,6 +150,7 @@ if (typeof _webinos === "undefined") {
                list.push(connectedDevices[i].pzp[j].id);
               }
            }
+          }
         }
         return list;
     };
