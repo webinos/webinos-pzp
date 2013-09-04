@@ -45,9 +45,9 @@ if (typeof _webinos === "undefined") {
     function updateConnected(message){
         if (message.pzhId) pzhId = message.pzhId;
         if (message.connectedDevices) connectedDevices = message.connectedDevices;
-        isConnected = !!(webinos.session.getConnectedPzh().indexOf(pzhId) !== -1);
         if (message.enrolled) enrolled = message.enrolled;
-        if (message.mode) mode = message.mode;
+        if (message.state) mode = message.state;
+        if (mode)  isConnected = (mode["Pzh"] === "connected" || mode["Pzp"] === "connected");
         if (message.hasOwnProperty("pzhWebAddress")) {
             webinos.session.setPzhWebAddress(message.pzhWebAddress);
         } 
