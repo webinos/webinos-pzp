@@ -209,6 +209,16 @@ describe("PZP default configuration in VIRGIN mode", function(){
         expect(pzp_api.getWebinosPorts()).not.toBeNull(); // Check PZP exposed API are having right value
         expect(pzp_api.getWebinosPorts()).toEqual(pzpInstance.getWebinosPorts());
     });
+    it("search particular service configuration data", function(){
+       var result = pzp_api.getServiceConfiguration("Test");
+       expect(result.displayName).toEqual("Test");
+       expect(result.api).toEqual("http://webinos.org/api/test");
+       expect(result.serviceAddress).toEqual((os.hostname()).substring(0,34));
+    });
+    it("change service configuration data", function(){
+       var result = pzp_api.setServiceConfiguration("test",{"params":{num: 52}});
+        expect(result).toBeTruthy();
+    });
 });
 
 describe("Master and connection certificates/privateKey", function() {
@@ -555,7 +565,7 @@ describe("machine with long Pzp Name", function(){
        });
    });
 });
- /*
+ 
 // Check sync with PZH
 describe("check synchronization with the PZH", function(){
     it("check at the pzp if contents match with the contents of the PZH", function(done){
@@ -586,4 +596,4 @@ describe("check synchronization with the PZH", function(){
         done();
     },2000);
 });
-   */
+ 
