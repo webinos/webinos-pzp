@@ -104,7 +104,8 @@
         };
         channel.onopen = function() {
           var url = window.location.pathname;
-          webinos.session.message_send({type: 'prop', payload: {status:'registerBrowser', value: url}});
+          var origin = window.location.origin;
+          webinos.session.message_send({type: 'prop', payload: {status:'registerBrowser', value: url, origin: origin}});
         };
         channel.onerror = function(evt) {
           console.log("WebSocket error" + JSON.stringify(evt));
