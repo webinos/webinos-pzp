@@ -147,7 +147,7 @@ if (typeof _webinos === "undefined") {
               list.push(connectedDevices[i]);
             } else {
               for (var j = 0; j < (connectedDevices[i].pzp && connectedDevices[i].pzp.length); j = j + 1){
-               list.push(connectedDevices[i].pzp[j].id);
+               list.push(connectedDevices[i].pzp[j]);
               }
            }
           }
