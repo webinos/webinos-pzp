@@ -36,17 +36,26 @@ $ (document).ready (function () {
     }
 
     function connectedDetails () {
-        var pzhId, connectedDevices = webinos.session.getConnectedDevices(), text="Connected Devices:"; // all connected pzp
+        var connectedStatus, connectedDevices = webinos.session.getConnectedDevices(), text="Connected Devices:"; // all connected pzp
         $ ("#connectedDevices").html("");
+
         for (var i = 0; i < connectedDevices.length; i += 1) {
             if(!webinos.session.getPZHId()) {
-                text += "<li><a>" + webinos.session.getFriendlyName(connectedDevices[i].id) + (connectedDevices[i] === webinos.session.getPZPId()?" (Your Device)": "")+"</a></li>";
+                connectedStatus = (connectedDevices[i].isConnected === false) ? "#B0B0B0":"#FFFFFF";
+                text += "<p style='color:"+connectedStatus+";text-align:left'>" +
+                    webinos.session.getFriendlyName(connectedDevices[i].id) +
+                    (connectedDevices[i] === webinos.session.getPZPId()?" (Your Device)": "")+"</p>";
             } else {
-                console.log(connectedDevices[i]);
-                text += "<li><a>" + webinos.session.getFriendlyName(connectedDevices[i].id) + (connectedDevices[i].id === webinos.session.getPZHId()?" (Your Hub)": "")+"</a></li>";
+                connectedStatus = (connectedDevices[i].isConnected === false) ? "#B0B0B0":"#FFFFFF";
+                text += "<p style='color:"+connectedStatus+";text-align:left'>" +
+                    webinos.session.getFriendlyName(connectedDevices[i].id) +
+                    (connectedDevices[i].id === webinos.session.getPZHId()?" (Your Hub)": "")+"</p>";
                 if(connectedDevices[i].pzp){
                     for (var j=0; j < connectedDevices[i].pzp.length; j = j + 1) {
-                        text += "<ul><li><a>" + webinos.session.getFriendlyName(connectedDevices[i].pzp[j].id) + (connectedDevices[i].pzp[j].id === webinos.session.getPZPId()?" (Your Device)": "")+"</a></li></ul>";
+                        connectedStatus = (connectedDevices[i].pzp[j].isConnected === false) ? "#B0B0B0":"#FFFFFF";
+                        text += "<p style='color:"+connectedStatus+";text-align:center'>" +
+                            "<li>" + webinos.session.getFriendlyName(connectedDevices[i].pzp[j].id) +
+                            (connectedDevices[i].pzp[j].id === webinos.session.getPZPId()?" (Your Device)": "")+"</li></p>";
                     }
                 }
             }
@@ -87,7 +96,7 @@ $ (document).ready (function () {
     webinos.session.addListener ('info', printInfo);
 
     function error (msg) {
-        logMessage (msg.payload.message);
+        logMessage ("ERROR :"+ msg.payload.message);
     }
     webinos.session.addListener ('error', error);
 
