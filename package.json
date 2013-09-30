@@ -1,5 +1,5 @@
 { "name": "webinos-pzp",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Webinos device functionality is implemented in PZP",
   "main": "./lib/pzp_sessionHandling.js",
   "author": "Habib Virji  <habib.virji@samsung.com>",
