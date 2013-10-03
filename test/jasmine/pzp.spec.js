@@ -511,7 +511,7 @@ describe("PZH - PZH certificate exchange", function() {
                     if ((i + 1) < numberOfPZH) findServicePzp(i+1);
                     else done();
                 });
-            }, 200); // A delay as connection between PZH take time to exchange services
+            }, 1000); // A delay as connection between PZH take time to exchange services
 
         }
         findServicePzp(1);
