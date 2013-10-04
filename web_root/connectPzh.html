@@ -8,21 +8,43 @@
   <script type="text/javascript" src="./webinos.js"></script>
   <script type="text/javascript">
     $ (document).ready (function () {
+      function setFriendlyName() {
+        console.log(webinos.session.getPZPId());
+        console.log(webinos.session.getFriendlyName(webinos.session.getPZPId()));
+        document.getElementById("friendlyName").setAttribute("value",
+        webinos.session.getFriendlyName(webinos.session.getPZPId()));
+      }
+      webinos.session.addListener ('registeredBrowser', setFriendlyName);
       $ ("#connectPzh").click (function () {
+        var deviceType = $("#deviceTypeList option:selected").val().trim();
+        if(!deviceType){
+          alert("Please set device type before connecting PZH");
+          return;
+        }
+        var friendlyName = document.getElementById ("friendlyName").value.trim();
+        if(!friendlyName){
+          alert("Please set device friendlyName before connecting PZH");
+          return;
+        }
+        var pzhAddress;
         if (document.getElementById ("own_pzh") && document.getElementById ("own_pzh").value !== "undefined" &&
                 document.getElementById ("own_pzh").value !== "") {
-          value = document.getElementById ("own_pzh").value.trim();
+            pzhAddress = document.getElementById ("own_pzh").value.trim();
         } else {
-          value = $ ("#pzh_list option:selected").val().trim();
+            pzhAddress = $ ("#pzh_list option:selected").val().trim();
         }
-        if (value === "localhost") {
+        if (pzhAddress === "localhost") {
             alert("Please use PZH IP address to connect. Using localhost is not supported");
         } else {
             $ ("#provider").hide ();
-            var options = {type:'prop', payload:{status:'setPzhProviderAddress', message:value}};
+            var options = {type:'prop', payload:{status:'setPzhProviderAddress', message:pzhAddress}};
             webinos.session.message_send (options);
-
-            window.location.href = "https://" + value + "/login?isPzp=true&port=" + webinos.session.getPzpPort ();
+            options = {type:'prop', payload:{status:'setFriendlyName',           message:friendlyName}};
+            webinos.session.message_send (options);
+            options = {type:'prop', payload:{status:'setDeviceType',             message:deviceType}};
+            webinos.session.message_send (options);
+            window.location.href ="https://" + pzhAddress + "/login?isPzp=true&port="+webinos.session.getPzpPort()+
+                                    "&deviceType="+deviceType+"&friendlyName="+friendlyName;
         }
       });
     });
@@ -36,6 +58,21 @@
     <label>Connect your device to a personal zone hub (PZH) </label>
   </header>
   <fieldset class="boxBody">
+    <label> Set Device Friendly Name </label>
+    <input type="text" value="" id="friendlyName"> </input>
+    <label> Set Device Type </label>
+    <select value="deviceTypeList" id="deviceTypeList">
+      <option value="smartphone"> Phone </option>
+      <option value="tablet"> Tablet </option>
+      <option value="ivi"> Car </option>
+      <option value="tv"> TV </option>
+      <option value="homemediabox"> MediaCenter </option>
+      <option value="pc" selected="selected"> PC </option>
+      <option value="laptop"> Laptop </option>
+      <option value="iot"> IoT </option>
+      <option value="unknown"> Unknown </option>
+    </select>
+
     <label>Select your personal zone hub provider</label>
     <select value="pzh_list" id="pzh_list">
       <option value="pzh.webinos.org"> pzh.webinos.org</option>
