@@ -196,17 +196,10 @@ describe("PZP default configuration in VIRGIN mode", function(){
 //        expect(serviceCache).toEqual(pzpInstance.getServiceCache());
     });
     it ("Default userData i.e. details that will be used by certificate", function() {
-        var userData = JSON.parse(fs.readFileSync(path.join(webinosPath,"userData","userDetails.json")).toString());
-        expect(userData).not.toBeNull();
         expect(pzpInstance.getUserData()).not.toBeNull();
-        expect(userData).toEqual(pzpInstance.getUserData());
     });
     it ("Ports configuration", function() {
-        var userPref = JSON.parse(fs.readFileSync(path.join(webinosPath,"userData","userPref.json")).toString());
-        expect(userPref).not.toBeNull();
         expect(pzpInstance.getWebinosPorts()).not.toBeNull();
-        expect(JSON.stringify(userPref.ports)).toEqual(JSON.stringify(pzpInstance.getWebinosPorts()));
-        expect(pzp_api.getWebinosPorts()).not.toBeNull(); // Check PZP exposed API are having right value
         expect(pzp_api.getWebinosPorts()).toEqual(pzpInstance.getWebinosPorts());
     });
     it("search particular service configuration data", function(){
@@ -518,7 +511,7 @@ describe("PZH - PZH certificate exchange", function() {
                     if ((i + 1) < numberOfPZH) findServicePzp(i+1);
                     else done();
                 });
-            }, 200); // A delay as connection between PZH take time to exchange services
+            }, 1000); // A delay as connection between PZH take time to exchange services
 
         }
         findServicePzp(1);
@@ -596,4 +589,3 @@ describe("check synchronization with the PZH", function(){
         done();
     },2000);
 });
- 
