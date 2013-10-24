@@ -8,7 +8,7 @@
         "iot": 3000
     },
     "friendlyName": "",
-    "retryConnection": 12000,
+    "retryConnection": 3000,
     "webinos_version": {
         "tag": "v0.8.0",
         "num_commit": "134",
