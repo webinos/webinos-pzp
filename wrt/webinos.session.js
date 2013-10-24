@@ -134,7 +134,7 @@ if (typeof _webinos === "undefined") {
        var list =[];
        if(pzhId) {
          for (var i = 0 ; i < connectedDevices.length; i = i + 1){
-           list.push(connectedDevices[i].id);
+             list.push(connectedDevices[i].id);
          }
        }
        return list;
@@ -144,10 +144,10 @@ if (typeof _webinos === "undefined") {
         if (connectedDevices){
            for (var i = 0 ; i < connectedDevices.length; i = i + 1){
             if(!pzhId) {
-              list.push(connectedDevices[i]);
+                  list.push(connectedDevices[i]);
             } else {
               for (var j = 0; j < (connectedDevices[i].pzp && connectedDevices[i].pzp.length); j = j + 1){
-               list.push(connectedDevices[i].pzp[j]);
+                  list.push(connectedDevices[i].pzp[j]);
               }
            }
           }

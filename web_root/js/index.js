@@ -53,8 +53,8 @@ $ (document).ready (function () {
                 if(connectedDevices[i].pzp){
                     for (var j=0; j < connectedDevices[i].pzp.length; j = j + 1) {
                         connectedStatus = (connectedDevices[i].pzp[j].isConnected === false) ? "#B0B0B0":"#FFFFFF";
-                        text += "<p style='color:"+connectedStatus+";text-align:center'>" +
-                            "<li>" + webinos.session.getFriendlyName(connectedDevices[i].pzp[j].id) +
+                        text += "<p>" +
+                            "<li style='color:"+connectedStatus+";text-align:center'>" + webinos.session.getFriendlyName(connectedDevices[i].pzp[j].id) +
                             (connectedDevices[i].pzp[j].id === webinos.session.getPZPId()?" (Your Device)": "")+"</li></p>";
                     }
                 }
