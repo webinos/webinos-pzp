@@ -33,6 +33,7 @@ var numberOfPZP,numberOfPZH;
 numberOfPZH= 2; // Change this value if you do not like 100 PZPs to be created
 numberOfPZP = 2;
 var USER_DOMAIN = "localhost";
+__EnablePolicyEditor = false;
 
 var RSA_START       = "-----BEGIN RSA PRIVATE KEY-----";
 var RSA_END         = "-----END RSA PRIVATE KEY-----";
@@ -207,10 +208,6 @@ describe("PZP default configuration in VIRGIN mode", function(){
        expect(result.displayName).toEqual("Test");
        expect(result.api).toEqual("http://webinos.org/api/test");
        expect(result.serviceAddress).toEqual((os.hostname()).substring(0,34));
-    });
-    it("change service configuration data", function(){
-       var result = pzp_api.setServiceConfiguration("test",{"params":{num: 52}});
-        expect(result).toBeTruthy();
     });
 });
 

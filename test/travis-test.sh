@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 ################################################################################
-#set -e
+set -e
 # Helper function - this will prepare the config file for use by PZH
 prepare_pzp_config(){
   config_backup_file=$1".bak"
