@@ -63,7 +63,7 @@ function findService(address, callback){
             expect(service.displayName).toEqual('Test');
             expect(service._testAttr).toEqual('HelloWorld');
             // POLICY: Check WRT POLICY
-            console.log("!!!!!!!!!!!!!!!!!!DEBUG",service.serviceAddress, address)
+            console.log("Service found",service.serviceAddress, address)
             if(service.serviceAddress === address) {
                 service.bindService({onBind:function (service1) {
                     expect(service1.id).toEqual(service.id);
@@ -338,7 +338,7 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
                 user = createPzh(pzhConnection, "hello0@"+USER_DOMAIN, "Hello#0");
             });
             pzhConnection.on("data", function (_buffer) {
-                wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                wUtil.webinosMsgProcessing.readJson(pzhConnection.id, _buffer, function (obj) {
                     if(obj.payload && obj.payload.type && obj.payload.type === "addPzh") {
                        enrollPzp(pzhConnection, user, pzpInstance);
                     } else if (obj.payload && obj.payload.message && obj.payload.message.payload && obj.payload.message.payload.status === "signedCertByPzh"){
@@ -388,7 +388,7 @@ describe("Create "+numberOfPZP+" PZP and Enroll with the Same PZH ", function(){
                   // We could use same pzhConnection as above but the event data needs to be handled
                   enrollPzp(pzhConnection, user, pzpInstance);
                   pzhConnection.on("data", function (_buffer) {
-                      wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                      wUtil.webinosMsgProcessing.readJson(pzpInstance.getSessionId(), _buffer, function (obj) {
                           if (obj&& obj.payload && obj.payload.message && obj.payload.message.payload && obj.payload.message.payload.status === "signedCertByPzh"){
                               expect(obj.payload.message.from).toEqual("hello0@"+pzhAddress);
                               expect(obj.payload.message.to).toEqual("hello0@"+pzhAddress+"/"+pzpInstance.getMetaData("webinosName"));
@@ -425,7 +425,7 @@ describe("PZH - PZH certificate exchange", function() {
                 function() {
                     var  pzpInstance, user = createPzh(socket, "hello"+i+"@"+USER_DOMAIN, "Hello#"+ i);
                     socket.on("data", function (_buffer) {
-                        wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                        wUtil.webinosMsgProcessing.readJson(user.id, _buffer, function (obj) {
                             if(obj.payload && obj.payload.type && obj.payload.type === "addPzh") {
                                 createPzp(numberOfPZP+i, function(pzpInstance_){
                                     pzpInstance = pzpInstance_;
@@ -458,7 +458,7 @@ describe("PZH - PZH certificate exchange", function() {
                     msg = {user: user, message: {type: "requestAddLocalFriend", "externalNickname":"hello"+i}};
                     socket.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify(msg)));
                     socket.on("data", function (_buffer) {
-                        wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                        wUtil.webinosMsgProcessing.readJson(user.identifier, _buffer, function (obj) {
                             if(obj.payload && obj.payload.type && obj.payload.type === "requestAddLocalFriend") {
                                 expect(obj.payload.message).toEqual(true);
                                 socket.socket.end();
@@ -482,7 +482,7 @@ describe("PZH - PZH certificate exchange", function() {
                     msg = {user: user, message: {type: "approveFriend", "externalUserId":"hello0@"+pzhAddress}};
                     socket.write(wUtil.webinosMsgProcessing.jsonStr2Buffer(JSON.stringify(msg)));
                     socket.on("data", function (_buffer) {
-                        wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                        wUtil.webinosMsgProcessing.readJson(user.identifier, _buffer, function (obj) {
                             if(obj.payload && obj.payload.type && obj.payload.type === "approveFriend") {
                                 expect(obj.payload.message).toEqual(true);
                                 socket.socket.end();
@@ -530,7 +530,7 @@ describe("machine with long Pzp Name", function(){
            function() {
                enrollPzp(pzhConnection, user, pzpInstance);
                pzhConnection.on("data", function (_buffer) {
-                   wUtil.webinosMsgProcessing.readJson(this, _buffer, function (obj) {
+                   wUtil.webinosMsgProcessing.readJson(pzpInstance.getSessionId(), _buffer, function (obj) {
                        if (obj&& obj.payload && obj.payload.message && obj.payload.message.payload && obj.payload.message.payload.status === "signedCertByPzh"){
                            expect(obj.payload.message.from).toEqual("hello0@"+pzhAddress);
                            expect(obj.payload.message.to).toEqual("hello0@"+pzhAddress+"/"+pzpInstance.getMetaData("webinosName"));
