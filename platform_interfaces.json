@@ -1,6 +1,6 @@
 {
   "android": {
-    "wrt": "/data/data/org.webinos.android/wrt",
+    "wrt_home": "/data/data/org.webinos.android/wrt",
     "web_root": "/data/data/org.webinos.android/node_modules/webinos/wp4/webinos/web_root",
     "QRImpl": "org.webinos.android.impl.QRImpl",
     "PZPNotificationManagerImpl": "org.webinos.android.impl.PZPNotificationManagerImpl",
