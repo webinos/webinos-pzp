@@ -365,16 +365,16 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
         pzpInstance.on("PZH_CONNECTED", function(){
             done();
         });
-    },1000);
+    },2000);
     it("Find service at the PZH", function(done){
         setTimeout(function() {
             findService("hello0@"+pzhAddress,function(status){
                 if (status) done();
             })
-        }, 200);// the update message that PZP sends take time to reach websocket client...
+        }, 500);// the update message that PZP sends take time to reach websocket client...
     }, 2000);
     // POLICY: Check at PZP by searching for service that is not allowed
-});
+},4000);
 ////// End of Single PZP test cases ....\\\\\\\\\\\\
 // Enroll multiple PZPs at a PZH
 describe("Create "+numberOfPZP+" PZP and Enroll with the Same PZH ", function(){
@@ -415,7 +415,7 @@ describe("Create "+numberOfPZP+" PZP and Enroll with the Same PZH ", function(){
        }
        createPzpEnroll(0);
    }, numberOfPZP*2000); // 1000 ms for each PZP to search service from the connected PZH...
-});
+}, numberOfPZP*2500);
 
 // Create PZH,inside PZH there will be single PZP, 2 PZH will connect each other and find service in PZP of other zone
 describe("PZH - PZH certificate exchange", function() {
@@ -513,7 +513,7 @@ describe("PZH - PZH certificate exchange", function() {
         }
         findServicePzp(1);
     }, numberOfPZH * 2000); // It takes extra time as more hops are involved
-});
+},  numberOfPZH * 3000);
 
 describe("machine with long Pzp Name", function(){
    it("create pzp with long name and enroll with pzh", function(done){
@@ -546,15 +546,15 @@ describe("machine with long Pzp Name", function(){
                                      pzhConnection.socket.end();
                                      done();
                                    });
-                               },3000); // Time Before everything get started....
-                           });
+                               },300); // Time Before everything get started....
+                           }, 3000);
                        }
                    });
                });
            });
        });
    });
-});
+}, 5000);
  
 // Check sync with PZH
 describe("check synchronization with the PZH", function(){
@@ -585,4 +585,4 @@ describe("check synchronization with the PZH", function(){
         expect(Object.keys(pzpData).length).toEqual(Object.keys(pzhData).length);
         done();
     },2000);
-});
+},5000);
