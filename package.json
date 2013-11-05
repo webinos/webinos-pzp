@@ -16,11 +16,11 @@
   },
   "bundleDependencies":["webinos-api-test"],
   "dependencies":{
-    "webinos-certificateHandler": "git://github.com/webinos/webinos-certificateHandler.git",
-    "webinos-utilities"         : "git://github.com/webinos/webinos-utilities.git",
-    "webinos-policy"            : "git://github.com/webinos/webinos-policy.git",
-    "webinos-dashboard"         : "git://github.com/webinos/webinos-dashboard.git",
-    "webinos-api-applauncher"   : "git://github.com/webinos/webinos-api-applauncher.git",
+    "webinos-certificateHandler": "git://github.com/webinos/webinos-certificateHandler",
+    "webinos-utilities"         : "git://github.com/webinos/webinos-utilities",
+    "webinos-policy"            : "git://github.com/webinos/webinos-policy",
+    "webinos-dashboard"         : "git://github.com/webinos/webinos-dashboard",
+    "webinos-api-applauncher"   : "git://github.com/webinos/webinos-api-applauncher",
     "webinos-jsonrpc2"          : "*",
     "websocket"                 : "1.0.2",
     "optimist"                  : "x.x.x"
