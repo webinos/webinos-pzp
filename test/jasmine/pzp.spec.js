@@ -371,8 +371,8 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
             findService("hello0@"+pzhAddress,function(status){
                 if (status) done();
             })
-        }, 500);// the update message that PZP sends take time to reach websocket client...
-    }, 2000);
+        }, 1000);// the update message that PZP sends take time to reach websocket client...
+    }, 3000);
     // POLICY: Check at PZP by searching for service that is not allowed
 });
 ////// End of Single PZP test cases ....\\\\\\\\\\\\
