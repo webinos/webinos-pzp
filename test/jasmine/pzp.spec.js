@@ -365,14 +365,14 @@ describe("PZH - PZP connectivity, enrollment, and findService at PZH", function(
         pzpInstance.on("PZH_CONNECTED", function(){
             done();
         });
-    },1000);
+    },2000);
     it("Find service at the PZH", function(done){
         setTimeout(function() {
             findService("hello0@"+pzhAddress,function(status){
                 if (status) done();
             })
-        }, 50);// the update message that PZP sends take time to reach websocket client...
-    }, 1000);
+        }, 1000);// the update message that PZP sends take time to reach websocket client...
+    }, 3000);
     // POLICY: Check at PZP by searching for service that is not allowed
 });
 ////// End of Single PZP test cases ....\\\\\\\\\\\\
@@ -405,7 +405,7 @@ describe("Create "+numberOfPZP+" PZP and Enroll with the Same PZH ", function(){
                                           if ((i+1) < numberOfPZP) createPzpEnroll(i + 1);
                                           else done();
                                       });
-                                  },100); // Time Before everything get started....
+                                  },750); // Time Before everything get started....
                               });
                           }
                       });
@@ -509,7 +509,6 @@ describe("PZH - PZH certificate exchange", function() {
                     else done();
                 });
             }, 1000); // A delay as connection between PZH take time to exchange services
-
         }
         findServicePzp(1);
     }, numberOfPZH * 2000); // It takes extra time as more hops are involved
@@ -546,14 +545,14 @@ describe("machine with long Pzp Name", function(){
                                      pzhConnection.socket.end();
                                      done();
                                    });
-                               },1000); // Time Before everything get started....
+                               },500); // Time Before everything get started....
                            });
                        }
                    });
                });
            });
        });
-   });
+   },2000);
 });
  
 // Check sync with PZH
