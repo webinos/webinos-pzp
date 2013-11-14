@@ -16,11 +16,17 @@
  *
  *******************************************************************************/
 
+var fs = require ("fs");
+var path = require ("path");
+var optimist = require ('optimist');
+var logger;
+
 var Pzp = require ("./lib/pzp");
 var PzpSession = require("./lib/pzp_sessionHandling.js");
+var wutil = require ('webinos-utilities');
 __EnablePolicyEditor = false;
 
-var argv = require ('optimist')
+var argv = optimist
     .usage ('Starts webinos PZP \nUsage: $0')
     .options ({
         "pzpHost" :
@@ -67,27 +73,31 @@ var argv = require ('optimist')
             describe:"start the PZP and exit if it loaded successfully.  Useful for testing the build",
             default :false
         },
+        "debug":{
+            describe:"Enables verbose logging output.",
+            default :false
+        },
         "help"            :{
             describe:"to get this help menu"
         }})
     .argv;
 
 if (argv.help) {
-    require ('optimist').showHelp ();
+    optimist.showHelp ();
     process.exit ();
 }
 if (argv.policyEditor) {
     __EnablePolicyEditor = true;
 }
 
-require ("fs").readFile (require ("path").join (__dirname, "config-pzp.json"), function (err, data) {
+fs.readFile (path.join (__dirname, "config-pzp.json"), function (err, data) {
     var config = {};
     if (!err) {
         config = JSON.parse (data);
     }
 
     // overwrite config file options with cli options
-    config = require ('webinos-utilities').webinosHelpers.extend (config, argv);
+    config = wutil.webinosHelpers.extend (config, argv);
 
     if (config.pzhName !== "") {
         config.sessionIdentity = config.pzhHost + '/' + config.pzhName;
@@ -116,7 +126,7 @@ function initializeWidgetServer () {
                     wrtConfig.runtimeWebServerPort = wrtPort;
                     wrtConfig.pzpWebSocketPort = PzpSession.getWebinosPorts().pzp_webSocket;
                     wrtConfig.pzpPath = PzpSession.getWebinosPath ();
-                    require ("fs").writeFile ((require ("path").join (PzpSession.getWebinosPath(), '/wrt/webinos_runtime.json')),
+                    fs.writeFile ((path.join (PzpSession.getWebinosPath(), '/wrt/webinos_runtime.json')),
                         JSON.stringify (wrtConfig, null, ' '), function (err) {
                             if (err) {
                                 console.log ('error saving runtime configuration file: ' + err);
@@ -153,28 +163,8 @@ function ask(name) {
     })
 }
 function initializePzp (config) {
-   // Add a command line option to configure ports
-  /*if (!Pzp.session.getPzpConfigurationStatus()) { // PZP is not configured .. Reconfigure it
-      if (process.stdout.isTTY && process.stdin.isTTY) {
-          logger.log("Welcome to Webinos PZP","Current used ports by PZP are ", require("config.json").ports);
-          process.stdin.resume()
-          logger.log("Do you wish to change these ports? (Y/N): ");
-          process.stdin.once('data', function(data){
-             var response = data.toString().trim().toLowerCase();
-             if (response === "y") {
-                 require("config.json").ports.forEach(function(name){
-                    ask(name);
-                 });
-                 Pzp.session.setInputConfig(config);
-             } else {
-                 Pzp.session.setInputConfig(config);
-             }
-             startPzp();
-          });
-      } else {
-          startPzp();
-      }
-   }    */
+    logger = wutil.webinosLogging(__filename);
+    logger.setConfig(config);
     PzpSession.setInputConfig(config);
     startPzp();
 }
