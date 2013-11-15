@@ -1,0 +1,6 @@
+@font-face {
+  font-family: 'Ovo';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Ovo'), url(/css/ovo.woff) format('woff');
+}
