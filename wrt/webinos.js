@@ -44,8 +44,8 @@
             hostname = window.location.hostname;
             if (hostname == "") isWebServer = false; // We are inside a local file.
             if(hostname !== "localhost" && hostname !=="127.0.0.1") {
-              console.log("websocket connection is only possible with address localhost or 127.0.0.1. Please change to localhost or 127.0.0.1 " +
-                  "to connect to the PZP");
+            if(webinos.logging()) { console.log("websocket connection is only possible with address localhost or 127.0.0.1. Please change to localhost or 127.0.0.1 " +
+                  "to connect to the PZP"); }
             }
 
             // Find out the communication socket info.
@@ -60,16 +60,16 @@
                         var resp = JSON.parse (xmlhttp.responseText);
                         port = resp.websocketPort;
                     } else { // We are not inside a pzp or widget server.
-                        console.log ("CAUTION: webinosConfig.json failed to load. Are you on a pzp/widget server or older version of webinos? Trying the guess  communication channel's port.");
+                        if(webinos.logging()) { console.log ("CAUTION: webinosConfig.json failed to load. Are you on a pzp/widget server or older version of webinos? Trying the guess  communication channel's port."); }
                         port = port + 1; // Guessing that the port is +1 to the webserver's. This was the way to detect it on old versions of pzp.
                     }
                 } catch (err) { // XMLHttpRequest is not supported or something went wrong with it.
-                    console.log ("CAUTION: The pzp communication host and port are unknown. Trying the default communication channel.");
+                    if(webinos.logging()) { console.log ("CAUTION: The pzp communication host and port are unknown. Trying the default communication channel."); }
                     useDefaultHost = true;
                     useDefaultPort = true;
                 }
             } else { // Let's try the default pzp hostname and port.
-                console.log ("CAUTION: No web server detected. Using a local file? Trying the default communication channel.");
+                if(webinos.logging()) { console.log ("CAUTION: No web server detected. Using a local file? Trying the default communication channel."); }
                 useDefaultHost = true;
                 useDefaultPort = true;
             }
@@ -92,7 +92,7 @@
         webinos.session.setPzpPort (port);
 
         channel.onmessage = function (ev) {
-            console.log ('WebSocket Client: Message Received : ' + JSON.stringify (ev.data));
+            if(webinos.logging()) { console.log ('WebSocket Client: Message Received : ' + JSON.stringify (ev.data)); }
             var data = JSON.parse (ev.data);
             if (data.type === "prop") {
                 webinos.session.handleMsg (data);

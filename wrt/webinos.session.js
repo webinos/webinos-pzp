@@ -20,6 +20,12 @@
 if (typeof exports === "undefined") exports = window;
 if (typeof exports.webinos === "undefined") exports.webinos = {};
 if (typeof exports.webinos.session === "undefined") exports.webinos.session = {};
+if (typeof exports.webinos.logging === "undefined") exports.webinos.logging = function(enable){
+    if(typeof enable === "boolean") {
+        enable?localStorage.setItem("verboseLoggingEnabled","true"):localStorage.removeItem("verboseLoggingEnabled");
+    }
+    return (typeof localStorage != "undefined" && "true" === localStorage.getItem("verboseLoggingEnabled"));
+};
 
 if (typeof _webinos === "undefined") {
     _webinos = {};
@@ -99,12 +105,16 @@ if (typeof _webinos === "undefined") {
             "resp_to":webinos.session.getSessionId(),
             "payload":rpc};
         if(rpc.register !== "undefined" && rpc.register === true) {
-            console.log(rpc);
+            if(webinos.logging()) {
+                console.log(rpc);
+            }
             channel.send(JSON.stringify(rpc));
         }else {
-            console.log("creating callback");
-            console.log("WebSocket Client: Message Sent");
-            console.log(message);
+            if(webinos.logging()) {
+                console.log("creating callback");
+                console.log("WebSocket Client: Message Sent");
+                console.log(message);
+            }
             channel.send(JSON.stringify(message));
         }
     };
