@@ -22,7 +22,7 @@ if (typeof exports.webinos === "undefined") exports.webinos = {};
 if (typeof exports.webinos.session === "undefined") exports.webinos.session = {};
 if (typeof exports.webinos.logging === "undefined") exports.webinos.logging = function(enable){
     if(typeof enable === "boolean") {
-        enable?localStorage.setItem("verboseLoggingEnabled","true"):localStorage.removeItem("verboseLoggingEnabled");
+        enable ? localStorage.setItem("verboseLoggingEnabled","true") : localStorage.removeItem("verboseLoggingEnabled");
     }
     return (typeof localStorage != "undefined" && "true" === localStorage.getItem("verboseLoggingEnabled"));
 };
@@ -111,9 +111,7 @@ if (typeof _webinos === "undefined") {
             channel.send(JSON.stringify(rpc));
         }else {
             if(webinos.logging()) {
-                console.log("creating callback");
-                console.log("WebSocket Client: Message Sent");
-                console.log(message);
+                console.log("WebSocket Client: Message Sent", message);
             }
             channel.send(JSON.stringify(message));
         }
