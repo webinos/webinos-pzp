@@ -24,7 +24,7 @@ if (typeof exports.webinos.logging === "undefined") exports.webinos.logging = fu
     if(typeof enable === "boolean") {
         enable ? localStorage.setItem("verboseLoggingEnabled","true") : localStorage.removeItem("verboseLoggingEnabled");
     }
-    return (typeof localStorage != "undefined" && "true" === localStorage.getItem("verboseLoggingEnabled"));
+    return (typeof localStorage != "undefined" && localStorage && "true" === localStorage.getItem("verboseLoggingEnabled"));
 };
 
 if (typeof _webinos === "undefined") {
