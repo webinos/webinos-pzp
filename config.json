@@ -4,8 +4,7 @@
         "provider_webServer": 443,
         "pzp_webSocket": 8080,
         "pzp_tlsServer": 8040,
-        "pzp_zeroConf": 4321,
-        "iot": 3000
+        "pzp_zeroConf": 4321
     },
     "friendlyName": "",
     "retryConnection": 3000,
