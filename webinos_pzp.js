@@ -166,6 +166,8 @@ function initializePzp (config) {
     logger = wutil.webinosLogging(__filename);
     logger.setConfig(config);
     PzpSession.setInputConfig(config);
+    // Set up path for widget storage.
+    process.env["WRT_HOME"] = path.join(wutil.webinosPath.webinosPath(),"wrt/widgetStore");
     startPzp();
 }
 
